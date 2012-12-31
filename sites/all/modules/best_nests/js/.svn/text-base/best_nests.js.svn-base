@@ -1,0 +1,343 @@
+var tbn = {};
+
+jQuery(document).ready( function(){
+	$('body').append('<div id="add-image-dlg"></div>');
+	$('body').append('<div id="update-success">Your data has been saved.</div>');
+	
+	
+	$('#from-date').datepicker({minDate : 0, dateFormat: 'yy-mm-dd'});
+	$('#to-date').datepicker({minDate : 0, dateFormat: 'yy-mm-dd'});
+    $('#edit-from-availability').datepicker({minDate : 0, dateFormat: 'yy-mm-dd'});
+    $('#edit-to-availability').datepicker({minDate : 0, dateFormat: 'yy-mm-dd'});
+    $('#edit-from-discount').datepicker({minDate : 0, dateFormat: 'yy-mm-dd'});
+    $('#edit-to-discount').datepicker({minDate : 0, dateFormat: 'yy-mm-dd'});
+    //$('#filter-form')[0].reset();
+    
+    
+    $('#block-discount-search').datepicker({minDate :0, dateFormat: 'yy-mm-dd'});
+    
+
+    if (location.pathname.substr(1).split('/')[0] == "edit-listing"){
+    	tbn.getListingImageForm($('#listing-nid').val());
+        
+        $("div#add-image-dlg").dialog({
+		autoOpen : false,
+		title: 'Add Image',
+		width: 420,
+		height: 260,
+		buttons: {"Cancel": function() {$(this).dialog("close");}}
+	});
+    }
+    
+	
+	
+	
+	$('#update-success').dialog({
+		autoOpen : false,
+		title: 'Update Success',
+		buttons: {"Ok": function() {$(this).dialog("close");}}
+	});
+    
+    $('#long-listing-image-container a').lightBox({
+        imageBtnClose: '/sites/all/modules/best_nests/css/images/lightbox-btn-close.gif'
+    });
+    
+    try{ 
+        $('#listing-state').val($('#listing-state')[0].getAttribute("stateval"));
+    }catch(e){} 
+});
+
+
+tbn.getListingImageForm = function(listing_nid){
+	$.ajax({
+		url : '/get-listing-image-form/' + listing_nid,
+		dataType : 'html',
+		success : function(txt){
+			$('div#add-image-dlg').append(txt);
+		}
+	});
+};
+
+tbn.addCalendarPeriod = function(){
+	var data = {
+		discount: $("#discount").val(),
+		listing_nid: $("#listing-nid").val(),
+        type: $("input[name=type]:checked").val()
+	};
+	
+	data.from = $('#from-date').val().split('/');
+	data.from = data.from[2] + data.from[0] + data.from[1];
+	
+	data.to = $('#to-date').val().split('/');
+	data.to = data.to[2] + data.to[0] + data.to[1];
+
+	$.ajax({
+		url : '/add-calendar-period',
+		type : 'post',
+		data : data,
+		success : function(){
+            var type = $("input[name=type]:checked").val();
+            var discount = $('#listing-base-price').val() * ((100 - $("#discount").val()) * .01);
+            
+			var row = '<tr onclick="tbn.selectRow(this)">';
+            row +=      "<td>" + $("#from-date").val() + "</td>";
+            row +=      "<td>" + $("#to-date").val() + "</td>";
+            
+            if (type == "discount"){
+                row +=      "<td>" + $("#discount").val() + "%</td>";
+                row +=      "<td>$" + discount + "</td>";
+            }else{
+                row +=      "<td>" + type + "</td>";
+                row +=      '<td><select onchange=""><option>Change to...</option><option value="available">Available</option>';
+                row +=      '<option value="provisionally-booked">Provisionally Booked</option><option value="fully-booked">Fully Booked</option>';
+                row +=      '<select>';
+            }
+            
+            row +=    '</tr>';
+			$('#' + type + '-table').append(row);
+            
+            $('#from-date').val('');
+            $('#to-date').val('');
+            $("#discount").val('');
+		}
+	})
+};
+
+
+tbn.editListingDetails = function(){
+	data = {
+        title		: $("#listing-title").val(),
+        body		: $("#listing-details-ta").val(),
+		base_price 	: $("#listing-base-price").val(),
+		beds		: $("#listing-beds").val(),
+		baths		: $("#listing-baths").val(),
+		city		: $("#listing-city").val(),
+		state		: $("#listing-state").val(),
+		desc		: $("#listing-description-ta").val(),
+		listing_nid : $("#listing-nid").val(),
+        cleaning_fee: $("#listing-cleaning-fee").val(),
+        minimum_stay: $("#listing-minimum-stay").val(),
+        website     : $("#listing-website").val(),
+        youtube_link: $("#listing-youtube-link").val()
+        
+	};
+	
+	$.ajax({
+		url : '/update-listing',
+		type : 'post',
+		data : data,
+		success : function(){
+			$('#update-success').dialog("open");
+		}
+	});
+	
+}
+
+/*
+function bnAddRntalPeriod(){
+	// create the hidden field for form submittal
+	var from = $('#from-date').val().split('/');
+	from = Math.round((new Date(from[2], from[0], from[1])).getTime() / 1000);
+	
+	var to = $('#to-date').val().split('/');
+	to = Math.round((new Date(to[2], to[0], to[1])).getTime() / 1000);
+	
+	var discount = $('#discount').val();
+	var val = from + '|' + to + '|' + discount;
+	var add = '<input type="hidden" name="rental_periods[]" value="' + val + '" />';
+	
+	$('#best-nests-create-listing-form').append(add);
+	
+	
+	// now create the row in the table so they can see the rental period they just created
+	var row = "<tr><td>" + $("#from-date").val() + "</td><td>" + $("#to-date").val() + "</td><td>" +
+	"" + $("#discount").val() + "</td></tr>";
+	$('#rental-periods-table').append(row);
+}
+*/
+
+tbn.deleteImages = function(){
+    data = {
+		listing_nid : $("#listing-nid").val(),
+        filenames : Array()
+	};
+    
+    var images = $('#long-listing-image-container img.image-selected');
+    images.each( function(){
+        src = this.src.split('/');
+        data.filenames.push("'" + src[src.length-1] + "'");
+    });
+    
+    data.filenames = data.filenames.join(',');
+	$.ajax({
+		url : '/delete-images',
+		type : 'post',
+		data : data,
+		success : function(){
+            $('#long-listing-image-container img.image-selected').remove();
+        }
+	});
+}
+
+tbn.setDefaultImage = function(){
+    data = {
+		listing_nid : $("#listing-nid").val()
+	};
+    
+    var image = $('#long-listing-image-container img.image-selected');
+    var src = image[0].src.split('/');
+    data.filename = src[src.length-1];
+    
+	$.ajax({
+		url : '/set-default-image',
+		type : 'post',
+		data : data,
+		success : function(){
+            $('#long-listing-image-container img.default-image').removeClass('default-image');
+            var img = $('#long-listing-image-container img.image-selected');
+            img.removeClass('image-selected');
+            img.addClass('default-image');
+            
+            
+        }
+	});
+}
+
+tbn.selectImage = function(element){
+    element = $(element);
+    if (element.hasClass("image-selected")){
+        element.removeClass("image-selected");
+    }else{
+        element.addClass("image-selected")
+    }
+}
+
+tbn.selectRow = function(element){
+    element = $(element);
+    if (element.hasClass("row-selected")){
+        element.removeClass("row-selected");
+    }else{
+        element.addClass("row-selected")
+    }
+}
+
+tbn.deleteRentalPeriod = function(){
+    data = {
+		ids : Array()
+	};
+    
+    var images = $('#rental-periods-table tr.row-selected input');
+    images.each( function(){
+        data.ids.push($(this).val())
+    });
+    
+    data.ids = data.ids.join(',');
+	
+    $.ajax({
+		url : '/delete-rental-periods',
+		type : 'post',
+		data : data,
+		success : function(){
+            $('#rental-periods-table tr.row-selected').remove();
+        }
+	});
+}
+
+tbn.changeAvailabilityStatus = function(){
+    data = {
+        id : $('#availability-id').val(),
+        status : $('#availability-status').val()
+    };
+    
+    
+    if (status != "select"){
+        var url = (status == "delete") ? '/delete-rental-periods' : '/change-availability-status';
+
+        $.ajax({
+            url : url,
+            type : 'post',
+            data : data,
+            success : function(){
+                $('#rental-periods-table tr.row-selected').remove();
+            }
+        });
+    }
+    
+}
+
+tbn.sendListingContact = function(){
+    var data = {
+        email:          $('#long-listing-email-address').val(),
+        arrival_date :  $('#long-listing-arrival-date').val(),
+        num_nights :    $('#long-listing-number-of-nights').val(),
+        phone:          $('#long-listing-home-phone').val(),
+        comments:       $('#long-listing-comments').val(),
+        listing_nid:    $('#listing-nid').val()
+    };
+    
+     $.ajax({
+            url : '/listing-contact',
+            type : 'post',
+            data : data,
+            success : function(){
+                
+            }
+        });
+}
+
+
+
+
+
+
+
+
+tbn.search = {};
+tbn.search.vals = { beds : "", baths : "", city : "", minPrice : "0", maxPrice : "1000000" };
+
+
+tbn.search.shortListingFilter = function(type, val){
+    // for ease, hide all the elements for a nanosecond
+    $('table.short-listing-container').hide();
+    
+    // add the filter to the those entered
+    tbn.search.vals[type] = val;
+    
+    // loop through the entered filter values and create the css attribute selector
+    var attributes = "";
+    jQuery.each(tbn.search.vals, function(index, value){   
+        if (index != "minPrice" && index != "maxPrice" && value.length > 0){
+            attributes += "[" + index + '="' + value + '"]';
+        }
+    });
+    
+    // select elements base on existing filters
+    var listings = $('table.short-listing-container' + attributes);
+
+    // loop through the elements(listing containers) and process
+    listings.filter(function(){
+       
+       // get the base price of this particular listing and cast. not casting 
+       // has unpredictable results
+       var listingPrice =  parseInt( $(this)[0].getAttribute('price') ); 
+
+       // kick out those that do not meet price criteria
+       return listingPrice >= parseInt(tbn.search.vals.minPrice) && 
+              listingPrice <= parseInt(tbn.search.vals.maxPrice);
+       
+       // finally, show what's left (those that meet the minimum price)
+    }).show();
+}
+
+
+tbn.blockDiscountSearch = function(){
+    date = $('#block-discount-search').val();
+    path = window.location.pathname.split("/");
+    if (path[1] == 'state'){
+        state = path[2];
+    }
+        
+    console.debug(path);    
+    window.location = "/state/" + state + "/" + date;
+}
+

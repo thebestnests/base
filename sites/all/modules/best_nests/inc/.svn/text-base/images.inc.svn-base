@@ -1,0 +1,269 @@
+<?php
+
+function best_nests_process_image($source, $listing_nid){
+	if (isset($_FILES['files']) && $_FILES['files']['name'][$source] && is_uploaded_file($_FILES['files']['tmp_name'][$source])) {
+	    switch ($_FILES['files']['error'][$source]) {
+	      case UPLOAD_ERR_OK:
+	        break;
+	
+	      case UPLOAD_ERR_INI_SIZE:
+	      case UPLOAD_ERR_FORM_SIZE:
+	        drupal_set_message(t('The file %file could not be saved, because it exceeds %maxsize, the maximum allowed size for uploads.', array('%file' => $source, '%maxsize' => format_size(file_upload_max_size()))), 'error');
+	        return 0;
+	
+	      case UPLOAD_ERR_PARTIAL:
+	      case UPLOAD_ERR_NO_FILE:
+	        drupal_set_message(t('The file %file could not be saved, because the upload did not complete.', array('%file' => $source)), 'error');
+	        return 0;
+	
+	        // Unknown error
+	      default:
+	        drupal_set_message(t('The file %file could not be saved. An unknown error has occurred.', array('%file' => $source)), 'error');
+	        return 0;
+	    }
+	    
+        //error_log($_FILES['files']['type']['listing_image']);	    
+	    $fn = best_nests_save_image($_FILES['files']['tmp_name']['listing_image'], $_FILES['files']['type']['listing_image'], "tn");
+	    $fn = best_nests_save_image($_FILES['files']['tmp_name']['listing_image'], $_FILES['files']['type']['listing_image'], "full", 500, 500);
+	    
+	    if ($fn && $fn != "INVALID FORMAT"){
+	    	db_query("INSERT INTO best_nests_images(listing_nid, filename) VALUES (%d, '%s')",
+	    		$listing_nid, $path . $fn);
+	    }elseif($fn == "INVALID FORMAT"){
+            drupal_set_message("Invalid Format");
+        }
+		
+	}
+}
+
+
+
+function best_nests_save_image($filename, $mime, $type, $new_width = 125, $new_height = 125){
+	list($width, $height) = getimagesize($filename);
+	
+	if ($width > $new_width && $width > $height){
+		$new_height = $height * ($new_width / $width);
+	}else if ($width > $new_height && $width < $height){
+		$new_width = $width * ($new_height / $height);
+	}else{
+        $new_width = $width;
+        $new_height = $height;
+    }
+	
+    switch ($mime){
+        case "image/jpeg":
+        case "jpg":
+            $ext = ".jpg";
+            $create_func = 'imagecreatefromjpeg';
+            $image_func = 'imagejpeg';
+            break;
+        case "image/gif":
+        case "gif":
+            $ext = ".gif";
+            $create_func = 'imagecreatefromgif';
+            $image_func = 'imagegif';
+            break;
+        case "image/png":
+        case "png":
+            $ext = ".png";
+            $create_func = 'imagecreatefrompng';
+            $image_func = 'imagepng';
+            break;
+        default:
+            error_log('format');
+            return "INVALID FORMAT";
+            
+    }
+    
+	$md5_filename = md5_file($filename) . $ext;
+	
+	if (!best_nests_is_file_duplicate($md5_filename)){
+        $src_image = $create_func($filename);
+		$dest_image = imagecreatetruecolor($new_width, $new_height);
+		imagecopyresampled($dest_image, $src_image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+        
+        // for later - to crop all images to the same dimensions (50x50, etc) reverse the resize logic
+        // so that the smaller side ends up 50 or 500px
+        /*if ($type == 'tn'){
+            imagecopy($dest_image, $dest_image, 0,0,0,0,50,50);
+        }else{
+            imagecopy($dest_image, $dest_image, 0,0,0,0,500,500);
+        }*/
+        
+		// Output
+		$filepath = file_directory_path();
+		$image_func($dest_image, "/home/www/thebestnests/sites/default/files/listing_pics/$type/$md5_filename");
+	}else{
+		$md5_filename = FALSE;
+	}
+	
+	return $md5_filename;
+}
+
+
+
+function best_nests_get_listing_image_form($listing_nid){
+    $count = best_nests_get_listing_image_count($listing_nid);
+    if ($count < 8){
+    	echo drupal_get_form('best_nests_listing_image_form', $listing_nid);
+    }else{
+        echo "You have uploaded the maximum number of pictures. Delete existing
+            to upload different ones";
+    }
+}
+
+function best_nests_listing_image_form($ph, $listing_nid){
+	$form['#attributes'] = array(
+      'enctype' => "multipart/form-data"
+	);
+	
+	$form['listing_image'] = array(
+     	'#type'   => 'file',
+      	'#title'  => 'Image',
+    );
+    
+    $form['listing_nid'] = array(
+    	'#type'		=> 'hidden',
+    	'#value'	=> $listing_nid,
+    );
+    
+    	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t("Add Image"),
+	);
+    
+    return $form;
+}
+
+
+function best_nests_listing_image_form_submit($form, &$form_state){
+	best_nests_process_image('listing_image', $form_state['values']['listing_nid']);	
+
+	$form_state['redirect'] = "edit-listing/" . $form_state['values']['listing_nid'];
+}
+
+
+
+function best_nests_delete_images(){
+    $q = "DELETE from best_nests_images WHERE filename IN ({$_POST['filenames']}) AND listing_nid={$_POST['listing_nid']}";
+    //error_log($q);
+    db_query($q);
+}
+
+
+function best_nests_set_default_image(){
+    $q = "UPDATE best_nests_images SET is_default=1 WHERE filename ='{$_POST['filename']}' AND listing_nid={$_POST['listing_nid']}";
+    //error_log($q);
+    db_query($q);
+}
+
+
+function best_nests_is_file_duplicate($filename){
+	$is_duplicate = FALSE;
+	$q = db_result(db_query("SELECT COUNT(*) FROM best_nests_images WHERE filename='$filename'"));
+	
+	if ($q > 0){
+		$is_duplicate = TRUE;
+	}
+	
+	return $is_duplicate;	
+}
+
+
+
+
+function best_nests_get_listing_image_count($listing_nid){
+    $count = db_result(db_query("SELECT COUNT(listing_nid) FROM best_nests_images WHERE listing_nid=$listing_nid"));
+    return $count;
+}
+
+
+
+
+function best_nests_get_default_image($listing_nid){
+    $filename = db_result(db_query("SELECT filename FROM best_nests_images WHERE listing_nid=$listing_nid AND is_default = 1"));
+    if (empty($filename)){
+        $filename = db_result(db_query("SELECT filename FROM best_nests_images WHERE listing_nid=$listing_nid LIMIT 1"));
+    }
+    return $filename;
+}
+
+
+
+function import_images(){
+    
+    //error_log("\n". print_r($_FILES,1) . "\n\n");
+    $error = array();
+    $corrected_filenames = array();
+    
+    $nid_map = array();
+    $nid_map_query = db_query("SELECT listing_nid, old_nid FROM best_nests_listings");
+    while ($row = db_fetch_object($nid_map_query)){
+        $nid_map[$row->old_nid] = $row->listing_nid;
+    }
+    
+    //print_r($nid_map);
+    
+    if (($handle = fopen("/home/www/images.csv", "r")) !== FALSE) {
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            $filename = $data[0];
+            $listing_nid = db_result(db_query("SELECT listing_nid FROM best_nests_listings WHERE old_nid = {$data[1]}"));
+            $listing_nid = $nid_map[$data[1]];
+            
+            list($filename, $ext) = split('\.', $filename);
+            $filename = split("/", $filename);
+            $filename = $filename[count($filename) -1];
+            
+            $path = '/home/www/thebestnests/sites/default/files/tempfiles/'; 
+            
+            if (!file_exists($path . $filename . "." . $ext)){
+                if (!file_exists( $path . $filename . "_0." . $ext)){
+                    if (!file_exists( $path . $filename . "_1." . $ext)){
+                        if (!file_exists( $path . $filename . "_2." . $ext)){
+                            if (!file_exists( $path . $filename . "_3." . $ext)){
+                                if (!file_exists( $path . $filename . "_4." . $ext)){
+                                    $error[] = $filename . "." . $ext;
+                                }else{
+                                    $corrected_filenames[] = array("nid" => $listing_nid, "fn" => $filename . "_4." . $ext);
+                                }
+                            }else{
+                                $corrected_filenames[] = array("nid" => $listing_nid, "fn" => $filename . "_3." . $ext);
+                            }
+                        }else{
+                            $corrected_filenames[] = array("nid" => $listing_nid, "fn" => $filename . "_2." . $ext);
+                        }
+                    }else{
+                        
+                        $corrected_filenames[] = array("nid" => $listing_nid, "fn" => $filename . "_1." . $ext);
+                    }
+                }else{
+                    $corrected_filenames[] = array("nid" => $listing_nid, "fn" => $filename . "_0." . $ext);
+                }
+            }else{
+                $corrected_filenames[] = array("nid" => $listing_nid, "fn" => $filename . "." . $ext);
+            }
+        }
+    }
+     
+    foreach ($corrected_filenames as $row){
+        $ext = split("\.", $row['fn']);
+        $ext = $ext[count($ext) -1];
+        
+        $fn = best_nests_save_image('/home/www/thebestnests/sites/default/files/tempfiles/' . $row['fn'], $ext, "tn");
+        $fn = best_nests_save_image('/home/www/thebestnests/sites/default/files/tempfiles/' . $row['fn'], $ext, "full", 500, 500);
+
+        if ($fn){
+            db_query("INSERT INTO best_nests_images(listing_nid, filename) VALUES (%d, '%s')",
+                $row['nid'], $fn);
+        }else{
+            error_log("error");
+        }
+
+        //die();
+    }
+    
+    
+    error_log(count($error));
+    //error_log(print_r($error,1));
+}

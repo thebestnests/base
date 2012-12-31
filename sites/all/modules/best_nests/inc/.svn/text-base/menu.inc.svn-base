@@ -1,0 +1,160 @@
+<?php
+
+
+function best_nests_menu() { 
+	$items['create-listing'] = array(
+		'title' 			=> 'Create Listing',
+		'page callback' 	=> 'best_nests_create_listing',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_NORMAL_ITEM,
+	);
+
+	$items['my-listings'] = array(
+	    'title' 			=> 'My Listings',
+	    'page callback' 	=> 'best_nests_my_listings',
+	    'access arguments' 	=> array('access content'),
+	    'type'				=> MENU_NORMAL_ITEM,
+	);
+	
+    $items['search'] = array(
+		'page callback' 	=> 'Advanced Search',
+        'page callback' 	=> 'best_nests_search',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	); 
+    
+    $items['search-results'] = array(
+		'page callback' 	=> 'Search Results',
+        'page callback' 	=> 'best_nests_search_results',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+	
+	$items['state'] = array(
+	    'title' 			=> '',
+	    'page callback' 	=> 'best_nests_state_listings',
+	    'access arguments' 	=> array('access content'),
+	    'type'				=> MENU_NORMAL_ITEM,
+	);
+	
+	
+	$items['view-listing'] = array(
+		'title' 			=> '',
+		'page callback' 	=> 'best_nests_view_listing',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_NORMAL_ITEM,
+	);
+	
+    $items['get-listing-image-form'] = array(
+		'title' 			=> '',
+		'page callback' 	=> 'best_nests_get_listing_image_form',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+
+	$items['add-calendar-period'] = array(
+		'title' 			=> '',
+		'page callback' 	=> 'best_nests_add_calendar_period',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+	
+	$items['update-listing'] = array(
+		'title' 			=> '',
+		'page callback' 	=> 'best_nests_update_listing',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+
+    $items['edit-listing'] = array(
+		'title' 			=> 'Edit Listing',
+		'page callback' 	=> 'best_nests_edit_listing',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+	
+	$items['delete-images'] = array(
+		'page callback' 	=> 'best_nests_delete_images',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);  
+    
+    $items['set-default-image'] = array(
+		'page callback' 	=> 'best_nests_set_default_image',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['delete-rental-periods'] = array(
+		'page callback' 	=> 'best_nests_delete_rental_periods',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);  
+    
+    $items['change-availability-status'] = array(
+		'page callback' 	=> 'best_nests_change_availability_status',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['listing-contact'] = array(
+		'page callback' 	=> 'best_nests_listing_contact',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['checkout'] = array(
+		'page callback' 	=> 'best_nests_checkout',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['import'] = array(
+		'page callback' 	=> 'import_listings',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['delete-imported'] = array(
+		'page callback' 	=> 'delete_imported_listings',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['import-images'] = array(
+		'page callback' 	=> 'import_images',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	); 
+    
+    $items['import-discounts'] = array(
+		'page callback' 	=> 'import_discounts',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	); 
+    
+    $items['geoencode'] = array(
+		'page callback' 	=> 'best_nests_geoencode',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_CALLBACK
+	);
+    
+    $items['admin/utility'] = array(
+        'title'             => 'Utility',
+		'page callback' 	=> 'best_nests_utility',
+		'access arguments' 	=> array('access content'),
+		'type'				=> MENU_NORMAL_ITEM
+	);
+    
+    $items['pplistener'] = array(
+        'title' => 'Utility',
+        'page callback' => 'best_nests_paypal_ipn_listener',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+    
+
+    
+    return $items;
+}

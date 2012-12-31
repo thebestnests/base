@@ -1,0 +1,6 @@
+; $Id$
+name = Best Nests Custom Content Module
+description = Listings object, properties and operations
+package = 1 Admin
+core = 6.x
+php = 5.2

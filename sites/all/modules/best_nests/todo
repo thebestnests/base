@@ -1,0 +1,249 @@
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+NewSite2011&*
+(970) 396-8874
+
+WHM Address: http://50.22.84.66:2086
+Username: root
+Password: DNHjnjV84Jao
+
+un: admin
+paswd: is between quotes: "axlo9jwc"
+
+
+MAY 25 *****
+- audit site
+- reimport users and all data
+
+
+
+
+
+
+- admin page for editing static pages
+- image delete: make sure at least one image is selected
+- images showing up on state listings
+
+
+
+
+
+- Update Copy on How to List Property
+- Revise About Copy
+- Combine about and how to list?
+- Style jquery UI elements to match site stype 
+
+
+- abuse notifications
+
+ 
+
+
+
+Successful Tests		
+Create Listing 
+- All fields save properly
+- images add
+- set default image
+- delete image
+- add discount
+- remove discount
+- add fully booked
+- remove fully booked
+- add prov booked
+- remove prov booked
+
+State Listings
+- Discount calendar shows all discounted dates
+- Discount calendar has links to dates
+- Discount Search works
+- Listings are sorted by discount
+- Title shows state and date of discounts
+- retest that all filters work
+	- singly
+	- all different combinations
+
+Long Listing
+- youtube works	
+- All links work
+- discounts, bookings show up properly in calendars
+- discount shows up in tool tip
+- lightbox works
+
+Abuse
+manually mark paid in db to test
+- trigger works
+- deny works
+- approve works
+- avg discounts works
+- abuse history works
+
+
+Test
+- subscribe works properly
+- main contact form
+- listing contact form
+- capcha works on contact seller
+
+
+
+
+
+
+ 
+** RE-import
+- plan for re-importing everything
+- look over import scripts and adjust as necessary
+- import descriptions and bodies as appropriate
+- audit paid
+- each content type to import
+- how to test and verify import
+- how to deal with paid
+	- give everyone a month extension, time for them to subscribe before disabling their subscription
+
+
+
+
+
+** Google
+. add javascript to page template
+   - options
+    - jquery document load
+    - directly to page.tpl.php
+    - block - easiest
+
+
+
+FINAL REFACTOR
+- REMOVE ALL LOGIC FROM TPLS!!!!!!
+- UPDATE SCHEMA
+- misc.inc file
+- move nids, uids to cookie/session array
+
+
+Future
+- convert listing form from template to drupal form
+- admin settings (notification email, notify frequence)
+
+
+
+
+
+PENDING
+Paypal
+- add reoccuring payment declined handler to ipn
+	- plan for figuring this out
+- finish and clean up ipn
+	- all possibly cases covered
+	- why do i need to handle every code?
+	- need to understand how the messages come down in what order
+
+
+
+
+
+
+
+
+Hey John,
+ 
+Sorry for the delay. I am a bit sick at the moment. I'll try to give a call tonight. I am going to paste the Google code below. Thanks for adding this to the site. The code should just be pasted in the body section of the page source on the corresponding page.
+ 
+Thanks,
+ 
+Mac
+ 
+This bit of code just goes on the homepage:
+ 
+<!-- Google Code for Visited Home Page Remarketing List -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1019880095;
+var google_conversion_language = "en";
+var google_conversion_format = "3";
+var google_conversion_color = "666666";
+var google_conversion_label = "EtP6CPmQugIQn8Wo5gM";
+var google_conversion_value = 0;
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1019880095/?label=EtP6CPmQugIQn8Wo5gM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+
+This bit of code goes on a unique page that the user is directed to after purchasing a listing.
+ 
+<!-- Google Code for Purchased a Listing Remarketing List -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1019880095;
+var google_conversion_language = "en";
+var google_conversion_format = "3";
+var google_conversion_color = "666666";
+var google_conversion_label = "reBeCOGiugIQn8Wo5gM";
+var google_conversion_value = 0;
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1019880095/?label=reBeCOGiugIQn8Wo5gM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+This bit of code also goes on the page that a user is directed to after registering for an account on the site:
+ 
+<!-- Google Code for Register Conversion Page -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1019880095;
+var google_conversion_language = "en";
+var google_conversion_format = "1";
+var google_conversion_color = "ffffff";
+var google_conversion_label = "CtuwCJGOugIQn8Wo5gM";
+var google_conversion_value = 0;
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1019880095/?label=CtuwCJGOugIQn8Wo5gM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+ 
+This bit of code also goes on the unique page that users are directed to after paying for a listing:
+ 
+<!-- Google Code for Pay for Listing Conversion Page -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1019880095;
+var google_conversion_language = "en";
+var google_conversion_format = "1";
+var google_conversion_color = "ffffff";
+var google_conversion_label = "DeUPCIGQugIQn8Wo5gM";
+var google_conversion_value = 0;
+if (15) {
+  google_conversion_value = 15;
+}
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1019880095/?value=15&amp;label=DeUPCIGQugIQn8Wo5gM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+
+
+
+
+
+
+
+
+
+ 

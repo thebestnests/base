@@ -1,0 +1,132 @@
+<?php
+function best_nests_install(){
+	 drupal_install_schema('best_nests');
+  
+}
+
+function best_nests_uninstall(){
+   drupal_uninstall_schema('best_nests');
+}
+
+function best_nests_schema(){
+	$schema['best_nests_listings'] = array(
+    	'fields'  => array(
+			'listing_nid' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'base_price'	=> array(
+         			'type'		=> 'float',
+         	),
+         	'beds' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'baths' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'city' => array(
+	           		'type'      => 'varchar',
+	           		'length'  	=> '50',
+         	),
+         	'state' => array(
+	           		'type'      => 'varchar',
+	           		'length'  	=> '2',
+         	),
+         	'website' => array(
+	           		'type'      => 'varchar',
+	           		'length'  	=> '50',
+         	),
+         	'cleaning_fee' => array(
+	           		'type'      => 'float',
+         	),
+         	'minimum_stay' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+            'youtube_link' => array(
+                    'type'      => 'varchar',
+                    'length'    => '20'
+            )
+         	
+         ),	
+         'primary key' => array ("listing_nid"),
+		
+	);
+	
+	$schema['best_nests_calendar'] = array(
+    	'fields'  => array(
+			'id' => array(
+	           		'type'      => 'serial',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'listing_nid'=> array(
+         			'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	        ),
+        	'from_timestamp'=> array(
+         			'type'      => 'int',
+	           		'unsigned'  => TRUE,
+         			'size'		=> 'big'
+	        ),
+	        'to_timestamp' => array(
+         			'type'		=> 'int',
+	        		'unsinged'  => TRUE,
+         			'size'		=> 'big',
+         	),
+            'type' => array(
+         			'type'		=> 'int',
+         			'size'	=> 'tiny',
+         	),
+	        'discount' => array(
+         			'type'		=> 'int',
+         			'length'	=> 'tiny',
+         	),
+         ),
+         'primary key' => array ("id"),
+	);
+	
+	$schema['best_nests_images'] = array(
+    	'fields'  => array(
+         	'listing_nid'=> array(
+         			'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	        ),
+	        'path' => array(
+	         			'type'		=> 'varchar',
+	         			'length'	=> '50',
+	         ),
+	        'type' => array(
+	         			'type'		=> 'varchar',
+	         			'length'	=> '50',
+	         ),	
+	    ),	        
+	);
+	
+	$schema['best_nests_geocodes'] = array(
+    	'fields'  => array(
+         	'listing_nid'=> array(
+         			'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	        ),
+	        'lat' => array(
+	         			'type'		=> 'float',
+	         			'precision' => '10',
+                        'scale'     => '6'
+	         ),
+	        'lng' => array(
+	         			'type'		=> 'float',
+	         			'precision' => '10',
+                        'scale'     => '6'
+	         ),	
+	    ),	        
+	);
+	
+	return $schema;
+}

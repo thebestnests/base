@@ -1,0 +1,159 @@
+<?php
+
+
+/* orginally created listing with the forms api but the logical flow turned
+ * out better using ajax
+ 
+function best_nests_create_listing_form(){
+	$form['#attributes'] = array(
+      'enctype' => "multipart/form-data"
+	);
+	
+	
+	$form['basics'] = array(
+		'#type'		=> 'fieldset',
+		'#title' 	=> 'Basics',
+	);
+	
+	$form['basics']['title']  = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'Property Title',
+		//'#required' => TRUE,
+	);
+	
+	$form['basics']['website'] = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'Property Website',
+		//'#required' => TRUE,
+	);
+	
+	$form['basics']['beds'] = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'Bedrooms',
+		//'#required' => TRUE,
+		'#size'		=> "3"
+	);
+
+	$form['basics']['baths'] = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'Bathrooms',
+		//'#required' => TRUE,
+		'#size'		=> "3",
+	);
+
+	$form['basics']['body'] = array(
+		'#type' 	=> 'textarea',
+		'#title' 	=> 'Property Description',
+		//'#required' => TRUE,
+	);
+	
+	$form['basics']['listing_image'] = array(
+     	'#type'   => 'file',
+      	'#title'  => 'Picture',
+    );
+	
+	$form['location'] = array(
+		'#type'		=> 'fieldset',
+		'#title'	=> 'Location',
+	);
+	
+	$form['location']['city'] = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'City',
+		//'#required' => TRUE,
+	);
+	
+	$form['location']['state'] = array(
+		'#type' 	=> 'select',
+		'#title' 	=> 'State',
+		'#options'	=> best_nests_get_state_options(),
+		//'#required' => TRUE,
+	);
+	
+	$form['terms'] = array(
+		'#type' 	=> 'fieldset',
+		'#title'	=> 'Terms',
+	);
+	
+	$form['terms']['cleaning_fee'] = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'Cleaning Fee',
+		//'#required' => TRUE,
+		'#default_value' => '0.00',
+		'#attributes' => array("onclick" => "this.select()"),
+	);
+	
+	$form['terms']['minimum_stay'] = array(
+		'#type' 	=> 'textfield',
+		'#title' 	=> 'Minimum Stay',
+		//'#required' => TRUE,
+	);
+
+	$form['rental_periods'] = array(
+		'#type'		=> 'fieldset',
+		'#title'	=> 'Rental Periods and Discounts',
+		'#attributes' => array('id' => 'rental-period'),
+	);
+	
+	
+	
+	/** Section to add multiple rental periods via JS **
+	$page = '<table id="rental-periods-table"><tr><th>From</th><th>To</th><th>Discount</th></tr></table>';
+	$page .= '<label for="from-date">From Date: </label><input style="border: 1px solid black" type="text" id="from-date" /><br />';
+	$page .= '<label for="to-date">To Date: </label><input style="border: 1px solid black"  type="text" id="to-date" /><br />';
+	$page .= '<label for="discount">Discount: </label><input style="border: 1px solid black"  type="text" id="discount" /><br />';
+	$page .= '<input type="button" onclick="bnAddRentalPeriod()" value="Add Rental Period" id="add-rental-period-button" />';
+	
+	$form['rental_periods']['add_code'] = array(
+		'#type'		=> 'markup',
+		'#value'	=> $page 
+	);
+	
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t("Add Listing"),
+	);
+	
+	return $form;
+}
+
+
+function best_nests_create_listing_form_submit($form, &$form_state){
+	global $user;
+
+	$node = new stdClass();
+	$node->title = $form_state['values']['title'];
+	$node->body	= $form_state['values']['body'];
+	$node->type = 'best_nests_listing';
+	$node->uid = $user->uid;
+	$node->format = 1;
+	$node->name = $user->name;
+	
+	
+	$node->beds = $form_state['values']['beds'];
+	$node->baths = $form_state['values']['baths'];
+	$node->city = $form_state['values']['city'];
+	$node->state = $form_state['values']['state'];
+	$node->cleaning_fee = $form_state['values']['cleaning_fee'];
+	$node->minimum_stay = $form_state['values']['minimum_stay'];
+	$node->website = $form_state['values']['website'];
+
+	$node = node_submit($node);
+	if ($node){
+		node_save($node);
+	}else{
+		error_log("Error creating question");
+	}
+	
+	if (!is_null($_POST['rental_periods'])){
+		foreach ($_POST['rental_periods'] as $val){
+			best_nests_save_rental_period($node->nid, $val);
+		}
+	}
+
+	best_nests_process_image('listing_image', $node->nid);
+}
+*/
+
+?>

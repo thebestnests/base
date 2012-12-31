@@ -1,0 +1,76 @@
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+3. Add and activate listing
+    - create the listing - taken to blank page to fill in details
+    - pay for and activate listing
+        - where to put this direction/link
+    - test payment
+
+
+    - figure out return url and how to determine success or not
+        - ipn
+            - set up listener
+            - 
+    - update listing in db that a listing is paid
+    - feedback from paypal when subscription is declined
+    - unsub button
+
+5. abuse 
+   - get average discount
+   - when adding a discount period, if the discount being added is greater than 65% or 1.5% of the average
+     flag the discount and send to administrator for approval. 
+   - approval list
+        - actual list of discounts to approve
+        - button/link and function to mark approved
+   - add column to calendar table for approved
+
+6. add javascript to page template
+   - options
+    - jquery document load
+    - directly to page.tpl.php
+    - block - easiest
+
+7. availability status'
+
+
+
+CLEANUP************************************************************************************
+- finish styling advanced search results
+- convert imported descriptions to bodies
+- error handling for geocode
+- add default (not specified) for region
+- autoincrement id on calendar table
+- test for same upper/lower value on range searches
+- test region
+   - add new
+   - edit
+   - display
+   - filter
+   - search
+- test adding periods
+- default image
+- audit paid
+
+Paypal Questions
+- what happens when someones subscription payment (reoccuring) is declined?
+
+
+
+
+
+
+
+COMPLETE
+- update availability/discount period add
+- update queries for long listing display
+2. add region field to table, edit listing form template, search form and search results
+
+
+
+
+4. discount calendar block
+   - rework calendar create functions for 4 months vertical
+   - date has a link to the same page for that date
+   - date selector to go out beyond 4 months
+   - select dates where a discount exists not necessarily the properties or actual discounts
+

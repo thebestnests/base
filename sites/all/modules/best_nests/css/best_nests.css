@@ -1,0 +1,749 @@
+body div#page div#main-wrapper div#content-wrapper div#content{
+    border: none;
+    
+}
+
+body.front div#content-inner
+{
+    text-align: center;
+}
+
+body.front div#content-inner h2
+{
+    text-align: left;
+}
+
+a
+{
+	cursor: pointer;
+}
+
+#calendar-periods
+{
+    padding: 20px;
+}
+
+#calendar-periods table td, select
+{
+    font: 11px Arial;
+}
+
+#calendar-periods table th
+{
+    /*width: 75px;*/
+}
+
+#calendar-periods label
+{
+    width: 80px;
+    display: inline-block;
+    margin-bottom: 5px;
+    font-size: 12px
+}
+
+#add-rental-period-button
+{
+    /*background: url("/sites/all/themes/acquia_slate/images/submit-button.png") no-repeat scroll left top transparent;
+    border: 0 none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 1.1em;
+    height: 33px;
+    margin-top: 10px;
+    padding: 8px;
+    white-space: nowrap !important;*/ 
+}
+
+#rental-periods-table
+{
+    margin-bottom: 20px;
+}
+
+form#best-nests-create-listing-form fieldset, #add-rental-period 
+{
+    background-color: #eeeeee;
+}
+
+form#best-nests-create-listing-form #edit-beds-wrapper
+{
+    margin: -62px 0 0 435px;
+    width: 85px;
+}
+
+form#best-nests-create-listing-form #edit-baths-wrapper
+{
+    margin: -42px 0 0 535px;
+    width: 85px;
+}
+
+form#best-nests-create-listing-form #edit-title
+{
+    width: 617px;
+}
+
+form#best-nests-create-listing-form #edit-state-wrapper
+{
+    margin: -62px 0 0 425px;
+}
+
+
+
+
+
+#listings-list
+{
+	margin-top: 20px;
+}
+
+.short-listing-container
+{
+    border: 1px dotted #cccccc;
+    margin: 5px 0;
+    padding: 10px;
+}
+
+.short-listing-header
+{
+    font-size: 1.1428em;
+    font-weight: bold;
+    line-height: 1.25;
+    margin-bottom: 5px;
+    margin-right: 73px;
+}
+
+.short-listing-image-container td
+{
+    width: 100px;
+}
+
+
+.short-listing-data-container
+{
+    margin-left: 152px;
+}
+
+.short-listing-data-label
+{
+    font-weight: bold;
+    margin-right: 5px;
+    width: 110px;
+}
+
+#long-listing-table td.short-listing-data
+{
+    padding-right: 10px;
+}
+
+.short-listing-data input
+{
+	width: 75px;
+}
+
+#short-listing-data-description
+{
+  
+}
+
+#long-listing-youtube
+{
+	clear: both;
+}
+
+
+#edit-listing-details
+{
+    position: relative;
+	top: -45px;
+}
+
+#listing-city
+{
+	width: 120px;
+}
+
+#listing-details-ta
+{
+    margin-top: 0;
+    width: 625px;
+
+}
+
+.short-listing-rental-periods-table
+{
+    margin-top: 5px;
+    font: 11px Arial;
+}
+
+.short-listing-right
+{
+    float: right;
+    width: 515px;
+    
+}
+
+
+
+
+#long-listing-container
+{
+	float: left;
+    width: 665px;
+}
+
+
+#long-listing-image-container
+{
+	/*border: 1px solid #EEEFFF;*/
+    margin: 10px 0 40px 0;
+}
+
+
+.long-listing-image-tn
+{
+	max-height: 50px;
+    max-width: 50px;
+}
+
+#long-listing-website
+{
+    float: right;
+}
+
+
+#long-listing-table td
+{
+	white-space: nowrap;
+	padding: 0;
+}
+
+#long-listing-table td input
+{
+	width: 40px;
+	background-color: #dddddd;
+	padding: 3px;
+    margin-bottom: 5px;
+}
+
+#long-listing-table td input.longer
+{
+	width: 100px;
+}
+
+#edit-details-btn
+{
+	cursor: pointer;
+}
+
+#long-listing-table td input#listing-website.longer
+{
+	width: 150px;
+}
+
+table#long-listing-table input#listing-title
+{
+    width: 595px;
+    margin-left: 7px;
+
+}
+
+table#long-listing-table select#listing-state
+{
+    width: 90px;
+}
+
+table#long-listing-table input#listing-zip
+{
+	width: 65px;
+}
+
+/***** jQuery functional classes *****/
+.image-selected, .row-selected
+{
+    border: 2px solid red;
+}
+
+.default-image
+{
+    border: 2px solid blue;
+}
+
+#default-image-key
+{
+    border: 2px solid blue;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+}
+
+div#long-listing-contact-form
+{
+    float: right;
+    padding: 0 20px;
+    width: 420px;
+    border-left: 1px solid #cccccc;
+}
+
+
+div#long-listing-contact-form div.form-item
+{
+    margin: 10px 0;
+    padding: 0;
+}
+
+/*
+#long-listing-contact-form table thead th
+{
+    border: none;
+    font-size: 1.4285em;
+    line-height: 1.2em;
+    padding-bottom: 10px;
+}
+*/
+#long-listing-contact-form label
+{
+    padding: 0;
+    font-weight: bold;
+    font: bold 13px Helvetica;
+    display: inline-block;
+    width: 170px;
+}
+
+
+#long-listing-contact-form input[type="text"]
+{
+    border: 1px solid black;
+    width: 200px;
+}
+
+#long-listing-comments
+{
+    width: 195px;
+    height: 105px;
+}
+
+.long-listing-top
+{
+    vertical-align: top;
+}
+
+
+#long-listing-images
+{
+  float: left;
+  margin-right: 20px;
+  width: 255px;
+}
+
+#long-listing-large-image
+{
+    max-height: 250px;
+    max-width: 250px;
+}
+
+
+
+#long-listing-top
+{
+    float: left;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #cccccc;
+}
+
+#long-listing-details ul li
+{
+    font-weight: bold;
+}
+
+span.long-listing-data-label
+{
+    font-weight: normal;
+}
+
+
+
+div#long-listing-calendars
+{
+    
+}
+
+div.calendar-container
+{
+    float: left;
+    margin: 10px;
+    height: 205px;
+}
+
+
+#long-listing-calendars table
+{
+    border-top: 1px solid #eeeeee;
+    width: 200px;
+    font: normal 11px Arial;
+    float: left;
+    margin-right: 20px;
+}
+
+#long-listing-calendars table th
+{
+    border-bottom: 2px solid black;
+}
+
+#long-listing-calendars table th, #long-listing-calendars table td
+{
+    padding: 0;
+    border-bottom: 1px solid black;
+    height: 25px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#long-listing-calendars table th
+{
+    border-bottom: 2px solid black;
+}
+
+#add-period-container
+{
+    margin-top: 30px;
+}
+
+.periods-header
+{
+    font: bold 15px Arial;
+    text-decoration: underline;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+#availability-table
+{
+    /*width: 400px;*/
+}
+
+
+span.key-color.discount
+{
+    width: 13px;
+    height: 13px;
+}
+
+#long-listing-calendars table td.discount, span.key-color.discount
+{
+    border: 1px solid black;
+    /*cursor: help;*/
+}
+
+.available, .availability
+{
+    background-color: lightgreen;
+}
+
+.provisionally-booked
+{
+    background-color: yellow; 
+}
+
+.fully-booked
+{
+    background-color: lightpink;
+}
+
+.key-color
+{
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+
+#calendar-periods label.type-label
+{
+    width: 125px;
+ 
+}
+
+
+.period-col1
+{
+    width: 75px;
+}
+
+.period-col2
+{
+    width: 75px;
+}
+
+.period-col3
+{
+    width: 75px;
+}
+
+.period-col4
+{
+    width: 155px;
+}
+
+.calendar-table
+{
+    width: 700px;
+}
+
+
+div#long-listing-container fieldset
+{
+    width: 725px;
+}
+
+.req
+{
+    color: red;
+}
+
+
+table.short-listing-container td
+{
+    vertical-align: top;
+    padding: 0 5px;
+}
+
+table.short-listing-container td.short-listing-details
+{
+    padding-top: 10px;
+}
+
+#save-listing-details-btn
+{
+    vertical-align: top;
+}
+
+div.listings-list-filter
+{
+    margin-bottom: 20px;
+}
+
+.listing-filter-text
+{
+    border: 1px solid black;
+    width: 130px;
+}
+
+input.listing-filter-text + a
+{
+	cursor: pointer;
+	display: none;
+}
+
+
+.med
+{
+    width: 100px;
+}
+
+.short
+{
+    width: 50px;
+}
+
+.left
+{
+    
+}
+
+#edit-min-price-wrapper, #edit-max-price-wrapper, #edit-beds-wrapper, #edit-baths-wrapper,
+#edit-city-wrapper, #edit-state-wrapper, #edit-from-availability-wrapper, 
+#edit-to-availability-wrapper, #edit-from-discount-wrapper, #edit-to-discount-wrapper, #edit-zip-wrapper
+{
+    float: left;
+    margin-right: 10px;
+}
+
+
+
+.row
+{
+    width: 650px;
+    overflow: hidden;
+}
+
+.red
+{
+    color: red;
+}
+
+.match-percent
+{
+    text-align: right;
+}
+
+
+.cal-discount
+{
+    
+    border: 1px solid red;
+}
+
+
+
+
+
+.block-cal
+{
+    width: 100px;    
+}
+
+.block-cal td
+{
+   padding: 0;
+   font: normal 10px arial;
+   text-align: center;
+}
+
+.block-cal td.discount
+{
+    background-color: #dddddd;
+    cursor: help;
+}
+
+
+#block-discount-search
+{
+    border: 1px solid black;
+    width: 110px;
+    margin-bottom: 20px;
+    font: normal 11px Arial;
+    padding: 3px 5px 2px;
+}
+
+
+
+
+
+#best-nests-listing-contact-form label, #best-nests-listing-contact-form input, #best-nests-listing-contact-form textarea
+{
+	font-size: 90%
+}
+
+#best-nests-listing-contact-form div.form-item
+{
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+#contact-seller-link
+{
+	cursor: pointer;
+}
+
+.long-listing-large-image
+{
+	width: 225px;
+}
+
+span.disabled-span
+{
+	color:red;
+}
+
+
+#block-menu-menu-listing-menu ul li a[title="hide-me"]
+{
+	display: none;
+}
+
+
+#long-listing-details-new
+{
+	float: right;
+	width: 390px;
+}
+
+#long-listing-calendars-div
+{
+	clear: both;
+	margin-top: 20px;
+	float: left;
+}
+
+#abuse-
+{
+
+}
+
+#abuse-user
+{
+
+}
+
+#abuse-title
+{
+
+}
+
+#abuse-location
+{
+
+}
+
+#abuse-discount
+{
+
+}
+
+#abuse-avg
+{
+
+}
+
+#abuse-actions
+{
+
+}
+
+tr.red td
+{
+	color: red;
+}
+
+span.pending-approval
+{
+	font: normal 10px Arial;
+}
+
+.hidden
+{
+	display: none;
+}
+
+.red 
+{
+	color: red;
+}
+
+.listing-cal-div
+{
+	float: left;
+	height: 190px;
+}
+
+span.thedate
+{
+	display: inline-block;
+	padding: 1px;
+	text-align: left;
+	width: 100%;
+	font-size: 10px;
+	font-style: italic;
+}
+
+span.thediscount
+{
+	color: red;
+	font-weight: bold;
+}
+
+#loading-image
+{
+	width: 75px;
+	height: 75px;
+}

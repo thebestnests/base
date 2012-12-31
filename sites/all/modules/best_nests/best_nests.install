@@ -1,0 +1,245 @@
+<?php
+function best_nests_install(){
+	
+	$exists = db_result(db_query("SELECT count(*) FROM role WHERE name='lister'"));
+	if ($exists == 0){
+	 	db_query("INSERT INTO role (name) VALUES ('lister')");
+	}
+	 
+	$exists = db_result(db_query("SELECT count(*) FROM role WHERE name='renter'"));
+	if ($exists == 0){
+		db_query("INSERT INTO role (name) VALUES ('renter')");
+	}
+	
+	$exists = db_result(db_query("SELECT count(*) FROM role WHERE name='best_nests_admin'"));
+	if ($exists == 0){
+		db_query("INSERT INTO role (name) VALUES ('best_nests_admin')");
+	}
+  
+	
+	$exists = db_result(db_query("SELECT count(*) FROM menu_custom WHERE menu_name = 'tbn-admin'"));
+	if ($exists == 0){
+		$menu = new stdClass();
+	    $menu->menu_name = "tbn-admin";
+	    $menu->title = "Admin Menu";
+	    $menu->description = "The Best Nests Admin Menu";
+	    drupal_write_record('menu_custom', $menu);
+	}
+	
+	$exists = db_result(db_query("SELECT count(*) FROM menu_custom WHERE menu_name = 'tbn-lister'"));
+	if ($exists == 0){
+		$menu = new stdClass();
+	    $menu->menu_name = "tbn-lister";
+	    $menu->title = "Lister Menu";
+	    $menu->description = "The Best Nests Lister Menu";
+	    drupal_write_record('menu_custom', $menu);
+	}
+	
+	$exists = db_result(db_query("SELECT count(*) FROM menu_custom WHERE menu_name = 'listing'"));
+	if ($exists == 0){
+		$menu = new stdClass();
+	    $menu->menu_name = "listing";
+	    $menu->title = "Listing Menu";
+	    $menu->description = "The Best Nests Listing Menu";
+	    drupal_write_record('menu_custom', $menu);
+	}
+	
+	drupal_install_schema('best_nests');
+}
+
+function best_nests_uninstall(){
+   //drupal_uninstall_schema('best_nests');
+}
+
+function best_nests_schema(){
+	$schema['best_nests_listings'] = array(
+    	'fields'  => array(
+			'listing_nid' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'base_price'	=> array(
+         			'type'		=> 'float',
+         	),
+         	'beds' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'baths' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+         	'city' => array(
+	           		'type'      => 'varchar',
+	           		'length'  	=> '50',
+         	),
+         	'state' => array(
+	           		'type'      => 'varchar',
+	           		'length'  	=> '2',
+         	),
+         	'zip' => array(
+         		'type' => 'varchar',
+         		'length' => "10",
+         	),
+         	'region' => array(
+         		'type' => 'varchar',
+         		'length' => '30',
+         	),
+         	'paid' => array(
+         		'type' => 'int',
+         		'size' => 'tiny',
+         		'default' => '0',
+         	),
+         	'active' => array(
+         		'type' => 'int',
+         		'size' => 'tiny',
+         		'default' => '0',
+         	),
+         	'website' => array(
+	           		'type'      => 'varchar',
+	           		'length'  	=> '50',
+         	),
+         	'cleaning_fee' => array(
+	           		'type'      => 'float',
+         	),
+         	'minimum_stay' => array(
+	           		'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	           		'not null'  => FALSE,
+         	),
+            'youtube_link' => array(
+                    'type'      => 'varchar',
+                    'length'    => '100'
+            ),
+            'description' => array(
+            	'type' => 'varchar',
+            	'length' => '250',
+            ),
+         	
+         ),	
+         'primary key' => array ("listing_nid"),
+		
+	);
+	
+	$schema['best_nests_calendar'] = array(
+    	'fields'  => array(
+			'id' => array(
+           		'type'      => 'serial',
+           		'unsigned'  => TRUE,
+           		'not null'  => FALSE,
+         	),
+         	'listing_nid'=> array(
+         		'type'      => 'int',
+           		'unsigned'  => TRUE,
+	        ),
+        	'from_date'=> array(
+         		'type'      => 'datetime',
+	        ),
+	        'to_date' => array(
+         		'type'		=> 'datetime',
+         	),
+            'type' => array(
+         		'type'		=> 'varchar',
+         		'length'	=> '1',	
+         	),
+	        'discount' => array(
+         			'type'		=> 'int',
+         			'length'	=> 'tiny',
+         	),
+            'abuse_flag' => array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'default' => '0',
+            ),
+         ),
+         'primary key' => array ("id"),
+	);
+	
+	$schema['best_nests_images'] = array(
+    	'fields'  => array(
+         	'listing_nid'=> array(
+         		'type'      => 'int',
+	           	'unsigned'  => TRUE,
+	        ),
+	        'fid' => array(
+	         	'type'	=> 'int',
+	         ),
+	        'is_default' => array(
+	         	'type'	=> 'int',
+	         	'size' => 'tiny',
+	         ),	
+	    ),	        
+	);
+	
+	$schema['best_nests_geocodes'] = array(
+    	'fields'  => array(
+         	'listing_nid'=> array(
+         			'type'      => 'int',
+	           		'unsigned'  => TRUE,
+	        ),
+	        'lat' => array(
+	         			'type'		=> 'float',
+	         			'precision' => '10',
+                        'scale'     => '6'
+	         ),
+	        'lng' => array(
+	         			'type'		=> 'float',
+	         			'precision' => '10',
+                        'scale'     => '6'
+	         ),	
+	    ),	        
+	);
+
+
+    $schema['best_nests_abuse_tracking'] = array(
+        'fields'  => array(
+            'tracking_id' => array(
+                'type' => 'serial',
+            ),
+            'uid' => array(
+                'type' => 'int'
+            ),
+            'listing_nid'=> array(
+                'type'      => 'int',
+                'unsigned'  => TRUE,
+            ),
+            'discount' => array(
+                'type' => 'int',
+                'size' => 'small',
+            ),
+            'date' => array(
+                'type' => 'datetime'
+            ),
+        ),
+        'primary key' => array("tracking_id"),
+
+    );
+	
+    $schema['best_nests_ipn_messages'] = array(
+ 		'fields' => array(
+    		'id' => array(
+    			'type' => 'serial',
+    		),
+    		'item' => array(
+    			'type' => 'varchar',
+    			'length' => '50',
+    		),
+    		'status' => array(
+    			'type' => 'varchar',
+    			'length' => '50',
+    		),
+    		'txn_type' => array(
+    			'type' => 'varchar',
+    			'length' => '50',
+    		),
+    		'post' => array(
+    			'type' => 'blob',
+    		),
+    	)   
+    );
+    
+	return $schema;
+}

@@ -1,0 +1,489 @@
+<?php
+
+
+function best_nests_state_listings($state, $date = null){
+    
+    if (is_null($date)){
+        $date = date("Y-m-d");
+    }
+    
+    $listing_nids = db_query("
+        SELECT 
+            l.listing_nid, l.base_price, l.beds, l.baths, l.city, l.region, l.zip,
+            n.title,
+            nr.body
+        FROM 
+            best_nests_listings l,
+            node n, 
+            node_revisions nr
+        WHERE 
+            l.state='$state' AND
+            n.nid = l.listing_nid AND
+            nr.nid = listing_nid
+    ");
+
+    $listings = array();
+    while ($row = db_fetch_object($listing_nids)){
+        $row->discount = db_result(db_query("SELECT discount FROM best_nests_calendar WHERE listing_nid=$row->listing_nid AND type='discount' AND date ='$date'"));
+        $row->discount = (empty($row->discount)) ? 0 : $row->discount;
+        $row->default_image = best_nests_get_default_image($row->listing_nid);
+        $listings[] = $row;
+    }
+    
+    
+    usort($listings, best_nests_cmp);
+    
+    return theme('best-nests-short-listing', $listings);
+    
+}
+
+
+
+function best_nests_get_listings($state, $style = "full", $beds = '%', $baths = '%', $min_price = '0', $max_price = '100000'){
+    $listing_nids = db_result(db_query("
+        SELECT 
+            GROUP_CONCAT(listing_nid)
+        FROM 
+            best_nests_listings
+        WHERE 
+            state='$state' AND
+            beds LIKE '$beds' AND
+            baths LIKE '$baths' AND
+            base_price >= $min_price AND
+            base_price <= $max_price
+    "));
+
+    $listings = array();
+    $listing_nids = split(",", $listing_nids);
+    
+    foreach ($listing_nids as $listing_nid){
+        $listing = node_load($listing_nid);
+
+        if ($style == "full"){
+           $listing->discount = array(); 
+
+            $rental_periods = db_query("
+                SELECT 
+                    id, from_date, to_date, discount * .01 discount, type 
+                FROM 
+                    best_nests_calendar
+                WHERE 
+                    listing_nid=$listing_nid
+                ORDER BY
+                    from_date ASC");
+            
+            while ($row = db_fetch_object($rental_periods)){
+                if ($row->type == "discount"){
+                    $listing->discount[] = $row;
+                }else{
+                    $listing->available[] = $row;
+                }
+            }
+
+        }else{
+             $listing->discount = db_result(db_query(
+                "SELECT 
+                    discount
+                FROM 
+                    best_nests_calendar
+                WHERE 
+                    listing_nid = $listing_nid AND
+                    date = CURDATE() AND
+                    type != 'discount'
+                LIMIT 1"
+            ));
+
+            if ($listing->discount < 1){
+                $listing->discount = 0;
+            }
+        }
+
+        $listings[] = $listing;
+    }
+    
+    if ($style != "full"){
+        usort($listings, "best_nests_cmp");
+    }
+    
+    return $listings;
+}
+
+function best_nests_cmp($a,$b){
+    if ($a->discount == $b->discount){
+        return 0;
+    }
+
+    return ($a->discount > $b->discount) ? -1 : 1;
+}  
+
+/*
+function best_nests_view_short_listing($state, $date = NULL){
+    if ($_POST['submit']){
+        $beds = $_POST['filter_beds'];
+        $baths = $_POST['filter_baths'];
+        $min_price = ($_POST['filter_min_price'] != "min price") ? $_POST['filter_min_price'] : "0";
+        $max_price = ($_POST['filter_max_price'] != "max price") ? $_POST['filter_max_price'] : "100000";
+        
+        $listings = best_nests_get_listings($state, "short", $beds, $baths, $min_price, $max_price); // AND paid=1");
+    }else{
+    	$listings = best_nests_get_listings($state, "short"); // AND paid=1");
+    }
+    
+	return theme('best-nests-short-listing', $listings);
+}
+*/
+
+
+function best_nests_view_listing($nid){
+    $calendars = best_nests_listing_calendars(12, "listing", $nid);
+	return theme('best-nests-long-listing', node_load($nid), $calendars);
+}
+
+
+
+
+
+/** Create/Edit Listing **/
+function best_nests_create_listing(){
+    global $user;
+    $node = new stdClass();
+    $node = node_submit($node);
+    
+    $node->type = 'best_nests_listing';
+    $node->uid = $user->uid;
+    $node->format = 1;
+    $node->name = $user->name;
+    $node->paid = 0;
+    
+    if ($node){
+        node_save($node);
+    }else{
+        error_log("Error creating question");
+    }
+    
+    $node->images = array();
+    $node->availability = array();
+    $node->discounts = array();
+    
+    //return theme('best-nests-edit-listing', $node);
+    header("Location: /edit-listing/" . $node->nid);
+}
+
+function best_nests_edit_listing($listing_nid){
+    $listing = node_load($listing_nid);
+    $discounts = db_query("SELECT date, discount FROM best_nests_calendar WHERE listing_nid=$listing->nid AND type='discount' ORDER BY date");
+    while ($row = db_fetch_object($discounts)){
+        $listing->discount[] = $row;
+    }
+    
+    $availability = db_query("SELECT date FROM best_nests_calendar WHERE listing_nid=$listing->nid AND type='availability' ORDER BY date");
+    while ($row = db_fetch_object($availability)){
+        $listing->availability[] = $row;
+    }
+    
+    return theme('best-nests-edit-listing', $listing);
+}
+
+function best_nests_update_listing(){
+	$node = node_load($_POST['listing_nid']);
+	
+    $node->title = $_POST['title'];
+    $node->body = $_POST['body'];
+    
+	$node->beds = $_POST['beds'];
+	$node->baths = $_POST['baths'];
+	$node->base_price = $_POST['base_price'];
+	$node->city = $_POST['city'];
+	$node->state = $_POST['state'];
+	$node->minimum_stay = $_POST['minimum_stay'];
+    $node->cleaning_fee = $_POST['cleaning_fee'];
+    $node->website = $_POST['website'];
+    $node->youtube_link = $_POST['youtube_link'];
+    $node->zip = $_POST['zip'];
+    $node->region = $_POST['region'];
+    
+	
+	$node = node_submit($node);
+	if ($node){
+		node_save($node);
+	}else{
+		error_log("Error updating listing");
+	}
+	
+	var_dump($node);
+	
+}
+
+
+
+function best_nests_my_listings(){
+    error_log('test');
+    global $user;
+    $nids = db_query("SELECT nid FROM node WHERE type='best_nests_listing' AND uid=$user->uid");
+    $listings = array();
+    
+    while ($row = db_fetch_object($nids)){
+        $listings[] = node_load($row->nid);
+    }
+	return theme('best-nests-my-listings', $listings);
+}
+
+function best_nests_get_state_options(){
+	$selects = array();
+	$selects["AL"] = "Alabama"; 
+	$selects["AK"] = "Alaska"; 
+	$selects["AZ"] = "Arizona"; 
+	$selects["AR"] = "Arkansas"; 
+	$selects["CA"] = "California"; 
+	$selects["CO"] = "Colorado"; 
+	$selects["CT"] = "Connecticut"; 
+	$selects["DE"] = "Delaware"; 
+	$selects["DC"] = "District Of Columbia"; 
+	$selects["FL"] = "Florida"; 
+	$selects["GA"] = "Georgia"; 
+	$selects["HI"] = "Hawaii"; 
+	$selects["ID"] = "Idaho"; 
+	$selects["IL"] = "Illinois"; 
+	$selects["IN"] = "Indiana"; 
+	$selects["IA"] = "Iowa"; 
+	$selects["KS"] = "Kansas"; 
+	$selects["KY"] = "Kentucky"; 
+	$selects["LA"] = "Louisiana"; 
+	$selects["ME"] = "Maine"; 
+	$selects["MD"] = "Maryland"; 
+	$selects["MA"] = "Massachusetts"; 
+	$selects["MI"] = "Michigan"; 
+	$selects["MN"] = "Minnesota"; 
+	$selects["MS"] = "Mississippi"; 
+	$selects["MO"] = "Missouri"; 
+	$selects["MT"] = "Montana"; 
+	$selects["NE"] = "Nebraska"; 
+	$selects["NV"] = "Nevada"; 
+	$selects["NH"] = "New Hampshire"; 
+	$selects["NJ"] = "New Jersey"; 
+	$selects["NM"] = "New Mexico"; 
+	$selects["NY"] = "New York"; 
+	$selects["NC"] = "North Carolina"; 
+	$selects["ND"] = "North Dakota"; 
+	$selects["OH"] = "Ohio"; 
+	$selects["OK"] = "Oklahoma"; 
+	$selects["OR"] = "Oregon"; 
+	$selects["PA"] = "Pennsylvania"; 
+	$selects["RI"] = "Rhode Island"; 
+	$selects["SC"] = "South Carolina"; 
+	$selects["SD"] = "South Dakota"; 
+	$selects["TN"] = "Tennessee"; 
+	$selects["TX"] = "Texas"; 
+	$selects["UT"] = "Utah"; 
+	$selects["VT"] = "Vermont"; 
+	$selects["VA"] = "Virginia"; 
+	$selects["WA"] = "Washington"; 
+	$selects["WV"] = "West Virginia"; 
+	$selects["WI"] = "Wisconsin"; 
+	$selects["WY"] = "Wyoming";
+
+	return $selects;
+}
+
+
+function best_nests_listing_contact(){
+    
+    $listing = node_load($_POST['listing_nid']);
+    $user = user_load($listing->uid);
+    
+    $to = $user->mail;
+    $from = $_POST['email'];
+    
+    error_log($user->mail);
+    
+    $body = "Number of nights: " . $_POST['num_nights'] . "<br />" .
+            "Phone: " . $_POST['phone'] . "<br />" .
+            "Comments" . $_POST['comments'];
+    
+    $subject = "Listing Contact from The Best Nests"; 
+    
+    $headers  = 'MIME-Version: 1.0' . "\r\n";
+    $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+    
+    
+    mail($to, $subject, $body, $headers);
+    
+}
+
+
+
+
+function delete_imported_listings(){
+    for ($i = 62; $i < 564; $i++){
+        node_delete($i);
+    }
+}
+
+function import_listings(){
+    $states = best_nests_get_state_options();
+    
+    if (($handle = fopen("/home/www/node.csv", "r")) !== FALSE) {
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            error_log(print_r($data,1));
+            $node = new stdClass();
+             
+            $node->type = "best_nests_listing";
+            $node->old_nid = $data[0];
+            $node->uid = $data[1];
+            $node->name = $data[2];
+            $node->title = $data[3];
+            $node->body = $data[4];
+            $node->base_price = $data[5];
+            $node->beds = $data[6];
+            $node->baths = $data[7];
+            $node->city = $data[8];
+            
+            $node->state = array_search($data[9], $states);
+            
+            $node->cleaning_fee = $data[11];
+            $node->minimum_stay = $data[12];
+            $node->description = $data[13];
+            $node->website = $data[14];
+            $node->youtube_link = $data[15];
+	
+        	$node = node_submit($node);
+            
+            //var_dump($node);
+            
+            if ($node){
+                node_save($node);
+            }else{
+                error_log("Error updating listing");
+            }
+            
+            //die();
+	
+        }
+        fclose($handle);
+    }
+    
+    
+/*    
+    
+1. import base data into new nodes
+   - save old nid in listings table temporarily
+
+2. images
+   - download all images from old site into temp directory on new site
+   - alter image upload script to process all images in that directory
+   - use old nid from listings table to associate
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+SELECT 
+    a.nid, a.field_discount_price_value, 
+    b.field_discount_percentage_value, c.field_base_price_value
+FROM
+ * 
+    content_field_discount_price a, content_field_discount_percentage b, content_field_base_price c
+WHERE
+    b.nid=a.nid AND c.nid=a.nid
+GROUP BY 
+    a.nid
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+ SELECT
+	n.nid,
+        u.uid, u.name,
+	n.title, nr.body,
+	bp.field_base_price_value,
+	beds.field_bedrooms_value,
+	baths.field_bathrooms_value,
+	city.field_city_value,
+  
+    t.name,
+ 
+	state.field_state_value,
+	
+    c.field_cleaning_fee_value,
+	stay.field_miminum_night_stay_value,
+	d.field_property_description_value,
+	web.field_website_url,
+	yt.field_youtube_video_value
+
+
+FROM
+	node n, 
+        users u,
+	node_revisions nr,
+	content_field_base_price bp,
+	content_field_bedrooms beds,
+	content_field_bathrooms baths,
+	content_field_city city,
+	content_field_state state,
+	content_field_cleaning_fee c,
+	content_field_miminum_night_stay stay,
+	content_field_property_description d,
+	content_field_website web,
+	content_field_youtube_video yt,
+    term_data t  
+
+WHERE
+	n.type='listing_free' AND
+        u.uid = n.uid AND
+	nr.nid = n.nid AND
+	bp.nid = n.nid AND
+	beds.nid = n.nid AND
+	baths.nid = n.nid AND
+	city.nid  = n.nid AND
+	state.nid  = n.nid AND
+	c.nid  = n.nid AND
+	stay.nid  = n.nid AND
+	d.nid  = n.nid AND
+	web.nid  = n.nid AND
+	yt.nid  = n.nid AND
+    t.tid = state.field_state_value
+
+
+
+
+
+SELECT
+	f.filepath, c.nid
+	
+FROM
+	content_field_images c,
+	files f
+
+WHERE
+	f.fid = c.field_images_fid
+
+GROUP BY
+     c.nid   
+   
+  
+ */  
+}
+

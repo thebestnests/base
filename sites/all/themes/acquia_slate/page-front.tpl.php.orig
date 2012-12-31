@@ -1,0 +1,254 @@
+<?php 
+// $Id: page-front.tpl.php,v 1.1.4.1 2009/05/26 06:21:30 jwolf Exp $ 
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="<?php print $language->language; ?>" xml:lang="<?php print $language->language; ?>">
+
+  <head>
+    <title><?php print $head_title; ?></title>
+    <?php print $head; ?>
+    <?php print $styles; ?>
+    <!--[if IE 7]>
+      <?php print $ie7_styles; ?>
+    <![endif]-->
+    <!--[if lte IE 6]>
+      <?php print $ie6_styles; ?>
+    <![endif]-->
+    <?php if ($local_styles): ?>
+    <?php print $local_styles; ?>
+    <?php endif; ?>
+    <?php print $scripts; ?>
+  </head>
+
+  <body class="<?php print $body_classes; ?>">
+    <div id="page">
+      <?php if ($content): ?>
+      <div id="skip">
+        <a href="#main-content"><?php print t('Skip to Main Content'); ?></a>
+      </div>
+      <?php endif; ?>
+      <?php if ($banner): ?>
+      <div id="banner" class="clearfix">
+        <?php print $banner; ?>
+      </div><!-- /banner -->
+      <?php endif; ?> 
+      <?php if ($header_top): ?>
+      <div id="header-top" class="clearfix">
+        <?php print $header_top; ?>
+      </div><!-- /header-top -->
+      <?php endif; ?>
+      <div id="header-wrapper" class="clearfix">
+        <div id="header-first">
+          <?php if ($logo): ?> 
+          <div id="logo">
+            <a href="<?php print check_url($front_page) ?>" title="<?php print t('Home') ?>"><img src="<?php print $logo ?>" alt="<?php print t('Home') ?>" /></a>
+          </div>
+          <?php endif; ?>
+          <?php if ($site_name): ?>
+          <h1><a href="<?php print check_url($front_page) ?>" title="<?php print t('Home'); ?>"><?php print $site_name; ?></a></h1>
+          <?php endif; ?>
+        </div><!-- /header-first -->
+        <div id="header-middle">
+          <?php if ($site_slogan): ?>
+          <div id="slogan">
+            <?php print $site_slogan; ?>
+          </div>
+          <?php endif; ?>
+          <?php if ($header_middle): ?>
+          <?php print $header_middle; ?>
+          <?php endif; ?>
+        </div><!-- /header-middle -->
+        <div id="search-box">
+          <?php print $search_box; ?>
+        </div><!-- /search-box -->
+      </div><!-- /header-wrapper -->
+            <?php if ($primary_links): ?>
+        <div id="primary-menu">
+          <?php print theme('links', $primary_links); ?>
+        </div><!-- /primary_menu -->
+      <?php endif; ?>
+      <?php if ($preface_sidebar || $mission) : ?>
+      <div id="preface-wrapper" class="clearfix" <?php print $banner_image; ?>>
+        <?php if ($preface_sidebar): ?>
+          <div id="preface-sidebar">
+            <?php print $preface_sidebar; ?>
+          </div>
+        <?php endif; ?>
+        <?php if ($mission): ?>
+          <div id="mission"> 
+            <?php print $mission; ?>
+          </div>
+        <?php endif; ?>
+      </div><!-- /preface-wrapper -->
+      <?php endif; ?>
+      <div id="main-wrapper" class="clearfix">  
+        <?php if ($sidebar_first): ?>
+        <div id="sidebar-first">
+          <?php print $sidebar_first; ?>
+        </div><!-- /sidebar-first -->
+        <?php endif; ?>
+          <div id="content-wrapper">
+          <?php if ($messages): ?>
+          <?php print $messages; ?>
+          <?php endif; ?>
+          <?php if ($help): ?>
+          <?php print $help; ?>
+          <?php endif; ?>
+          <div id="content">
+            <a name="main-content" id="main-content"></a>
+            <?php if ($tabs): ?>
+            <div id="content-tabs" class="clear">
+              <?php print $tabs; ?>
+            </div>
+            <?php endif; ?>
+            <?php if ($content || $title): ?>
+            <div id="content-inner" class="clear">
+              <?php //if ($content): ?>
+              <?php //print $content; ?>
+              <?php //endif; ?>
+              <h2>Welcome to TheBestNests.com, the #1 value-based meeting place for owners of rental properties and people who want to rent terrific locations at the best possible prices.</h2>
+              
+              <div id="state-c1">
+    <ul class="statelist">
+        <li><a title="AL - Montgomery, Alabama" href="<?php print $base_path; ?>state/alabama"> Alabama</a></li>
+        <li><a title="AK - Juneau, Alaska" href="<?php print $base_path; ?>state/alaska"> Alaska</a></li>
+        <li><a title="AZ - Phoenix, Arizona" href="<?php print $base_path; ?>state/arizona"> Arizona</a></li>
+        <li><a title="AR - Little Rock, Arkansas" href="<?php print $base_path; ?>state/arkansas"> Arkansas</a></li>
+        <li><a title="CA - Sacramento, California" href="<?php print $base_path; ?>state/california"> California</a></li>
+        <li><a title="CO - Denver, Colorado" href="<?php print $base_path; ?>state/colorado"> Colorado</a></li>
+        <li><a title="CT - Hartford, Connecticut" href="<?php print $base_path; ?>state/connecticut"> Connecticut</a></li>
+        <li><a title="DE - Dover, Delaware" href="<?php print $base_path; ?>state/delaware"> Delaware</a></li>
+        <li><a title="DC - District of Columbia" href="<?php print $base_path; ?>state/district of columbia"> District of Columbia</a></li>
+        <li><a title="FL - Tallahassee, Florida" href="<?php print $base_path; ?>state/florida"> Florida</a></li>
+        <li><a title="GA - Atlanta, Georgia" href="<?php print $base_path; ?>state/georgia"> Georgia</a></li>
+        <li><a title="HI - Honolulu, Hawaii" href="<?php print $base_path; ?>state/hawaii"> Hawaii</a></li>
+        <li><a title="ID - Boise, Idaho" href="<?php print $base_path; ?>state/idaho"> Idaho</a></li>
+    </ul>
+</div>
+<div id="state-c2">
+    <ul class="statelist">
+        <li><a title="IL - Springfield, Illinois" href="<?php print $base_path; ?>state/illinois"> Illinois</a></li>
+        <li><a title="IN - Indianapolis, Indiana" href="<?php print $base_path; ?>state/indiana"> Indiana</a></li>
+        <li><a title="IA - Des Moines, Iowa" href="<?php print $base_path; ?>state/iowa"> Iowa</a></li>
+        <li><a title="KS - Topeka, Kansas" href="<?php print $base_path; ?>state/kansas"> Kansas</a></li>
+        <li><a title="KY - Frankfort, Kentucky" href="<?php print $base_path; ?>state/kentucky"> Kentucky </a></li>
+        <li><a title="LA - Baton Rouge, Louisiana" href="<?php print $base_path; ?>state/louisiana"> Louisiana </a></li>
+        <li><a title="ME - Augusta, Maine" href="<?php print $base_path; ?>state/maine"> Maine</a></li>
+        <li><a title="MD - Annapolis, Maryland" href="<?php print $base_path; ?>state/maryland"> Maryland</a></li>
+        <li><a title="MA - Boston, Massachusetts" href="<?php print $base_path; ?>state/massachusetts"> Massachusetts</a></li>
+        <li><a title="MI - Lansing, Michigan" href="<?php print $base_path; ?>state/michigan"> Michigan</a></li>
+        <li><a title="MN - St. Paul, Minnesota" href="<?php print $base_path; ?>state/minnesota"> Minnesota</a></li>
+        <li><a title="MS - Jackson, Mississippi" href="<?php print $base_path; ?>state/mississippi"> Mississippi</a></li>
+        <li><a title="MO - Jefferson City, Missouri" href="<?php print $base_path; ?>state/missouri"> Missouri</a></li>
+    </ul>
+</div> 
+<div id="state-c3">
+    <ul class="statelist">
+        <li><a title="MT - Helena, Montana" href="<?php print $base_path; ?>state/montana"> Montana</a></li>
+        <li><a title="NE - Lincoln, Nebraska" href="<?php print $base_path; ?>state/nebraska"> Nebraska</a></li>
+        <li><a title="NV - Carson City, Nevada" href="<?php print $base_path; ?>state/nevada"> Nevada</a></li>
+        <li><a title="NH - Concord, New Hampshire" href="<?php print $base_path; ?>state/new hampshire"> New Hampshire</a></li>
+        <li><a title="NJ - Trenton, New Jersey" href="<?php print $base_path; ?>state/new jersey"> New Jersey</a></li>
+        <li><a title="NM - Santa Fe, New Mexico" href="<?php print $base_path; ?>state/new mexico"> New Mexico</a></li>
+        <li><a title="NY - Albany, New York" href="<?php print $base_path; ?>state/new york"> New York</a></li>
+        <li><a title="NC - Raleigh, North Carolina" href="<?php print $base_path; ?>state/north carolina"> North Carolina</a></li>
+        <li><a title="ND - Bismarck, North Dakota" href="<?php print $base_path; ?>state/north dakota"> North Dakota</a></li>
+        <li><a title="OH - Columbus, Ohio" href="<?php print $base_path; ?>state/ohio"> Ohio</a></li>
+        <li><a title="OK - Oklahoma City, Oklahoma" href="<?php print $base_path; ?>state/oklahoma"> Oklahoma </a></li>
+        <li><a title="OR - Salem, Oregon" href="<?php print $base_path; ?>state/oregon"> Oregon</a></li>
+        <li><a title="PA - Harrisburg, Pennsylvania" href="<?php print $base_path; ?>state/pennsylvania"> Pennsylvania</a></li>
+    </ul>
+</div>        
+<div id="state-c4">
+    <ul class="statelist">
+        <li><a title="RI - Providence, Rhode Island" href="<?php print $base_path; ?>state/rhode island"> Rhode Island</a></li>
+        <li><a title="SC - Columbia, South Carolina" href="<?php print $base_path; ?>state/south carolina"> South Carolina</a></li>
+        <li><a title="SD - Pierre, South Dakota" href="<?php print $base_path; ?>state/south dakota"> South Dakota</a></li>
+        <li><a title="TN - Nashville, Tennessee" href="<?php print $base_path; ?>state/tennessee"> Tennessee</a></li>
+        <li><a title="TX - Austin, Texas" href="<?php print $base_path; ?>state/texas"> Texas</a></li>
+        <li><a title="UT - Salt Lake City, Utah" href="<?php print $base_path; ?>state/utah"> Utah</a></li>
+        <li><a title="VT - Montpelier, Vermont" href="<?php print $base_path; ?>state/vermont"> Vermont</a></li>
+        <li><a title="VA - Richmond, Virginia" href="<?php print $base_path; ?>state/virginia"> Virginia</a></li>
+        <li><a title="WA - Olympia, Washington" href="<?php print $base_path; ?>state/washington"> Washington</a></li>
+        <li><a title="WV - Charleston, West Virginia" href="<?php print $base_path; ?>state/west virginia"> West Virginia</a></li>
+        <li><a title="WI - Madison, Wisconsin" href="<?php print $base_path; ?>state/wisconsin"> Wisconsin</a></li>
+        <li><a title="WY - Cheyenne, Wyoming" href="<?php print $base_path; ?>state/wyoming"> Wyoming</a></li>
+    </ul>
+</div>
+<div style="clear:both;"></div>
+<div id="front-boxes">
+	<div class="fb-left">
+    	<h3>For Property Owners:</h3>
+        <p>TheBestNests.com offers the best tools in the industry to get property rented quickly and easily. TheBestNests.com provides owners with more control and options on their property profiles than any other rental service. Photos, videos and descriptive copy can be uploaded and revised anytime, day or night…24/7/365. If faster rental or a last-minute rental is desired, an owner can revise their base rental pricing by offering a limited time discount. This discount is immediately noted on TheBestNests.com and that owner's property will move up on the listing page, higher than other properties that are not offering as great a discount. This opportunity for value pricing, when desired, gives total flexibility to the owner…the ability to easily and quickly adjust pricing for real-time market conditions. TheBestNests.com provides the highest quality and flexibility at a significant savings versus competitive rental sites. For information on how to list your properties with TheBestNests.com, please click on "<a href="<?php print $base_path; ?>how-get-started">How to Get Started"</a>.</p>
+    </div>
+    <div class-"fb-right">
+    	<h3>For Renters:</h3>
+        <p>TheBestNests.com offers people interested in renting property the ability to achieve the best possible value, whether planning far into the future or deciding on a rental at the last minute. From beautiful photos, informative video and descriptive copy, interested renters can find properties that perfectly fit their needs, and TheBestNests.com also, exclusively, offers renters the opportunity to view and judge properties by the extent of the deal being offered. Renters can easily see those properties that are being offered at potentially significant discounts vs. their base rental prices. Because of this exclusive flexible pricing mechanism, value-oriented renters will love the opportunity to take advantage of high quality rentals offered at deeply discounted rates. To sign up with TheBestNests.com and take the first step toward the rental of your dreams, please click on a state.</p>
+    </div>
+</div>
+
+              
+              
+            </div>
+            <?php endif; ?>            
+            <?php if ($content_bottom): ?>
+            <div id="content-bottom">
+              <div class="corner top-right"></div>
+              <div class="corner top-left"></div>
+              <div class="inner">
+              <?php print $content_bottom; ?>
+              </div>
+              <div class="corner bottom-right"></div>
+              <div class="corner bottom-left"></div>
+            </div><!-- /content-bottom -->
+            <?php endif; ?>
+          </div><!-- /content -->
+        </div><!-- /content-wrapper -->
+        <?php if ($sidebar_last): ?>
+        <div id="sidebar-last">
+          <?php print $sidebar_last; ?>
+        </div><!-- /sidebar_last -->
+        <?php endif; ?>
+      </div><!-- /main-wrapper -->
+    </div><!-- /page -->
+    <?php if ($postscript_first || $postscript_middle || $postscript_last): ?>
+    <div id="postscripts">
+      <div id="postscript-wrapper" class="<?php print $postscripts; ?> clearfix">
+        <?php if ($postscript_first): ?>
+        <div id="postscript-first" class="column">
+          <?php print $postscript_first; ?>
+        </div><!-- /postscript-first -->
+        <?php endif; ?>
+        <?php if ($postscript_middle): ?>
+        <div id="postscript-middle" class="column">
+          <?php print $postscript_middle; ?>
+        </div><!-- /postscript-middle -->
+        <?php endif; ?>
+        <?php if ($postscript_last): ?>
+        <div id="postscript-last" class="column">
+          <?php print $postscript_last; ?>
+        </div><!-- /postscript-last -->
+        <?php endif; ?>
+      </div><!-- /postscript-wrapper -->
+    </div><!-- /postscripts -->
+    <?php endif; ?>
+    <?php if ($footer || $footer_message): ?>
+    <div id="footer" class="clearfix">
+      <div id="footer-wrapper">
+        <?php if ($footer_message): ?>
+        <div id="footer-message">
+          <?php print $footer_message; ?>
+        </div>
+        <?php endif; ?>
+        <?php if ($footer) : ?>
+          <div id="footer-region">
+            <?php print $footer; ?>
+          </div>
+        <?php endif; ?>
+      </div><!-- /footer-wrapper -->
+    </div><!-- /footer -->
+    <?php endif; ?>
+    <?php print $closure; ?>
+  </body>
+</html>

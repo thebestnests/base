@@ -1,0 +1,163 @@
+<div id="long-listing-container">
+	<input type="hidden" id="listing-nid" value="<?php echo $listing->nid ?>" /> 
+	<h1 class="title"><?php echo $listing->title; ?></h1>
+    <div id="long-listing-top">
+        <div id="long-listing-contact-form">
+            <!-- <form name="booking-form" id="booking-form"> -->
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2">Booking Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="label">Email Address: <span class="req">*</span></td>
+                        <td><input type="text" name="email-address" id="long-listing-email-address" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Date of Arrival: <span class="req">*</span></td>
+                        <td><input type="text" name="arrival-date" id="long-listing-arrival-date" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Number of nights: <span class="req">*<span></td>
+                        <td><input type="text" name="number-of-nights" id="long-listing-number-of-nights" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Home Phone: <span class="req">*</span></td>
+                        <td><input type="text" name="home-phone" id="long-listing-home-phone" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label long-listing-top">Comments & Questions <span class="req">*</span></td>
+                        <td rowspan="2"><textarea name="comments" id="long-listing-comments"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="label long-listing-top">
+                            <span class="button-wrapper">
+                                <span class="button">
+                                    <span>
+                                        <input type="button" class="form-submit" value="Submit" id="edit-submit" onclick="tbn.sendListingContact()" />
+                                    </span>
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>    
+                            
+        </div>
+    
+    
+        
+    <div id="long-listing-images">
+        <img id="long-listing-large-image" src="/sites/default/files/listing_pics/full/<?php echo $listing->default_image; ?>" />
+        <hr />
+        <?php array_shift($listing->images); ?>
+        <?php foreach ($listing->images as $image): ?>
+        <a href="/sites/default/files/listing_pics/full/<?php echo $image; ?>">
+            <img class="long-listing-image-tn" title="<?php echo $listings->title; ?>"
+                alt="Image of <?php echo $listings->title; ?>" src="/sites/default/files/listing_pics/tn/<?php echo $image; ?>" />
+        </a>
+        <?php endforeach; ?>
+        
+    </div>
+    
+    <div id="long-listing-details">
+        <ul>
+            <li>
+                <span class="long-listing-data-label">Bedrooms:</span>
+                <?php echo $listing->beds; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">Bathrooms:</span>
+                <?php echo $listing->baths; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">City:</span>
+                <?php echo $listing->city; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">State:</span>
+                <?php echo $listing->baths; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">Rental Price/night: </span>
+                $<?php echo $listing->base_price; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">Cleaning Fee:</span>
+                $<?php echo $listing->cleaning_fee; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">Minimum Stay:</span>
+                <?php echo $listing->minimum_stay; ?>
+            </li>
+            <li>
+                <span class="long-listing-data-label">Website:</span>
+                <a href="http://<?php echo $listing->website; ?>">
+                    http://<?php echo $listing->website; ?>
+                </a>
+            </li>
+        </ul>
+    </div>
+    </div>
+    
+    <div class="short-listing-data-description">
+        <!-- <span id="listing-details" class="short-listing-data-label">Property Description</span> -->
+        <h3>Property Description</h3>
+        <p name="details" id="listing-details-ta"><?php echo $listing->body; ?></p>
+    </div>
+	  
+    
+    <?php error_log($listing->youtube_link); ?>
+    <?php if ($listing->youtube_link): ?>
+    <div id="long-listing-youtube">
+        <iframe width="315" height="258" src="http://www.youtube.com/embed/<?php echo $listing->youtube_link; ?>" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <?php endif; ?>
+    
+    <h3>Availability & Discounts</h3>
+    <div class="calmonth-wrapper">
+        <h5>Key</h5>
+        <span class="key-color discount"></span><span class="key-label">Discount Available</span>
+        <span class="key-color available"></span><span class="key-label">Available</span>
+        <span class="key-color fully-booked"></span><span class="key-label">Fully Booked</span>
+        <span class="key-color provisionally-booked"></span><span class="key-label">Provisionally booked</span>
+    </div>
+    <div id="long-listing-calendars">
+        <?php echo $calendars; ?>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <?php /*
+
+    <table id="rental-periods-table">
+        <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Discount</th>
+            <th>Discounted Price</th>
+        </tr>
+
+        <?php foreach ($listing->rental_periods as $rental_period): ?>
+        <tr>
+            <td><?php echo $rental_period->from_date; ?></td>
+            <td><?php echo $rental_period->to_date; ?></td>
+            <td><?php echo $rental_period->discount * 100; ?>%</td>
+            <td>$<?php echo $listing->base_price * (1 - $rental_period->discount); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+			*/
+    ?>
+
+</div>

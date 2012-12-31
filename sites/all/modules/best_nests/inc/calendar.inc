@@ -1,0 +1,549 @@
+<?php
+
+function best_nests_build_month_calendar($month = 10, $year = 2011, $table_class = "block-cal", $day_classes = NULL){    
+    $month_timestamp = mktime(0,0,0, $month, 1, $year);
+    
+    $days_in_month = date("t", $month_timestamp);
+    $first_dow = date("w", $month_timestamp);
+    $last_dow = date("w", mktime(0,0,0, $month, $days_in_month, $year));
+    $leftover = 6 - $last_dow;
+    $num_weeks = ceil(   ($days_in_month + $first_dow + $leftover) / 7  );
+    
+    
+    $day_of_month = 1 - $first_dow;
+    
+    $calendar = array();
+    $calendar = array_pad($calendar, $num_weeks, NULL);
+    
+    if ($table_class != "block-cal"){
+    	$calendar_code = '<div class="listing-cal-div">';
+    }
+    
+    $calendar_code .= "<table class=\"$table_class\">";
+    $calendar_code .= '<tr><th colspan="7">' . date("F", $month_timestamp) . "</th></tr>";
+    
+    for ($week = 0; $week < $num_weeks; $week++){ //$calendar as &$week){
+        $calendar_code .= "<tr>";
+        for ($day = 0; $day < 7; $day++){
+            $code = "";
+            $class = "";
+            $title = "";
+            $href = "";
+            $state = split("/", $_SERVER['REQUEST_URI']);
+            $state = $state[2];
+            
+            if ($day_of_month > 0 && $day_of_month <= $days_in_month){
+                //$code = '<a href="' . $href . '" title="' . $title . '">' . $day_of_month . "</a>";
+                $code = '<span class="thedate">' . $day_of_month . '</span>';
+                
+                if (array_key_exists($day_of_month, $day_classes)){
+                	if (strpos($day_classes[$day_of_month], "discount") !== FALSE){
+                		$class = "discount";
+                		$title = substr($day_classes[$day_of_month], 9) . '%';
+                		$code .= '<br><span class="thediscount">' . substr($day_classes[$day_of_month], 9) . "%</span>";
+                	}else{
+                    	$class = $day_classes[$day_of_month];
+                	}
+                }
+            
+            
+	        	if ($table_class == "block-cal"){
+	        		$link_date = "$year-$month-$day_of_month"; 
+	        		$code = '<a href="/state/' . $state . '/' . $link_date .'">' . $day_of_month . '</a>';
+	                $title = "Discounts Available!";
+	                $href = "http://tbn.information-interactive.net/state/" . $state . "/$year-$month-$day_of_month";
+	            }
+            }
+            $calendar_code .= "<td class=\"$class\" title=\"$title\">$code</td>";
+            $day_of_month++;
+            //error_log($day);
+        }
+        $calendar_code .= "</tr>";
+    }
+   
+    $calendar_code .= "</table>";
+    
+    if ($table_class != "block-cal"){
+    	$calendar_code .= '</div>';
+    }
+    
+    
+    return $calendar_code;
+}
+
+
+
+function best_nests_listing_calendars($length = 1, $day_class_type = "listing", $listing_nid = 69){
+    $month = date("n");
+    $year = date("Y");
+    $length += $month;
+    
+    $calendars = "";
+    for ($month; $month < $length; $month++){
+        if ($day_class_type == "listing"){
+            $day_classes = best_nests_get_listing_day_classes($month, $year, $listing_nid);
+            $table_class = "listing-cal";
+        }elseif ($day_class_type == "block"){
+            $day_classes = best_nests_get_block_day_classes($month, $year);
+            $table_class = "block-cal";
+        }
+        
+        $calendars .= best_nests_build_month_calendar($month, $year, $table_class, $day_classes);   
+    }
+    
+    //return "Month: $month <br>Year: $year<br>Length: $length<br><br><pre>". /*print_r($day_classes, 1) .*/ "</pre><br>$calendars";
+    return $calendars;
+}
+
+
+
+function best_nests_get_listing_day_classes($month, $year, $listing_nid){ //($type, $listing_nid = NULL){
+   $result = db_query("
+        SELECT 
+            from_date, to_date, type, discount
+        FROM 
+            best_nests_calendar 
+        WHERE
+            abuse_flag = 0 AND
+            listing_nid = $listing_nid
+    ");
+    
+    $classes = array();
+    $full_class_names = array("d" => "discount", "f" => "fully-booked", "p" => "provisionally-booked");
+    
+    
+    while ($row = db_fetch_object($result)){
+    	$row->to_date = strtotime($row->to_date);
+    	$cur_day = strtotime($row->from_date);
+    	while ($cur_day <= $row->to_date){
+    		if (date("n", $cur_day) == $month && date("Y", $cur_day) == $year){
+				$classes[date("j", $cur_day)] = $full_class_names[ $row->type ];
+    			if ($row->type == "d"){
+    				$classes[date("j", $cur_day)] .= "|" . $row->discount;
+    			}
+    		}
+    		$cur_day += 86400;
+    	}
+    }
+    
+    return $classes;
+}
+
+
+function best_nests_get_block_day_classes($month, $year){
+	$state = explode("/", $_SERVER['REQUEST_URI']);
+	$state = $state[2];
+	
+    $result = db_query("
+        SELECT 
+            from_date, to_date
+        FROM 
+            best_nests_calendar 
+        WHERE
+            abuse_flag = 0 AND
+            type='d' AND
+            listing_nid IN 
+            	(SELECT listing_nid FROM best_nests_listings WHERE state='%s')
+            
+    ", $state);
+    
+    $classes = array();
+    while ($row = db_fetch_object($result)){
+    	$row->to_date = strtotime($row->to_date);
+    	$cur_day = strtotime($row->from_date);
+    	while ($cur_day <= $row->to_date){
+    		if (date("n", $cur_day) == $month && date("Y", $cur_day) == $year){
+    			$classes[date("j", $cur_day)] = "discount";		
+    		}
+    		$cur_day += 86400;
+    	}
+        
+    }
+    return $classes;
+}
+
+
+
+
+
+
+
+function best_nests_check_calendar_period($from, $to, $type, $listing_nid){
+	if ($type != "d"){
+		$type = "f', 'p";
+	}
+	
+	$exists = db_result(db_query("
+    	SELECT count(*) 
+    	FROM best_nests_calendar 
+    	WHERE
+    		type IN ('$type') AND 
+    		listing_nid = $listing_nid AND
+    		('$from' BETWEEN from_date AND to_date OR
+    		'$to' BETWEEN from_date AND to_date)
+    "));
+	
+	echo $exists;
+}
+
+
+
+function best_nests_add_calendar_period(){
+    $from = $_POST['from'];
+    $to = $_POST['to'];
+    
+	$from = str_replace("-", "", $from) . "000000";
+	$to = str_replace("-", "", $to) . "235959";    
+    
+    if ($date_clash == 0){
+    	$query = db_query("INSERT INTO best_nests_calendar (listing_nid, from_date, to_date, type, discount, abuse_flag)
+              VALUES ({$_POST['listing_nid']}, '$from',  '$to', '{$_POST['type']}', '{$_POST['discount']}', 0)");
+    	$id = db_last_insert_id("best_nests_calendar", "id");
+    }else{
+    	error_log("CLASH");
+    }
+    
+    
+	if ($_POST['type'] == "discount"){
+		$abuse = best_nests_check_discount_abuse($_POST['discount'], $_POST['listing_nid'], $id);
+	}
+    
+    /*
+    for($i = 0; $i < $days; $i++){
+        
+    }
+		
+    echo "INSERT INTO best_nests_calendar (id, listing_nid, date, type, discount)
+              VALUES (1, {$_POST['listing_nid']}, '$from' + INTERVAL " . $i . " DAY,  '{$_POST['type']}', {$_POST['discount']})";
+              */
+}
+
+
+
+function best_nests_delete_calendar_period($id){
+	//error_log($id);
+    db_query("DELETE from best_nests_calendar WHERE id = $id");
+}
+
+
+function best_nests_change_availability_status($id, $type){
+    $type = strtolower($type);
+    
+    db_query("UPDATE best_nests_calendar SET type='$type' WHERE id=$id");
+}
+
+
+
+
+//function best_nests_utility
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+function import_discounts(){
+   
+        $discounts = array(
+          array('listing_nid'=>56,'discount'=>0),
+          array('listing_nid'=>87,'discount'=>0),
+          array('listing_nid'=>142,'discount'=>-10),
+          array('listing_nid'=>95,'discount'=>87),
+          array('listing_nid'=>84,'discount'=>15),
+          array('listing_nid'=>57,'discount'=>0),
+          array('listing_nid'=>145,'discount'=>15),
+          array('listing_nid'=>139,'discount'=>0),
+          array('listing_nid'=>150,'discount'=>10),
+          array('listing_nid'=>154,'discount'=>12),
+          array('listing_nid'=>166,'discount'=>42),
+          array('listing_nid'=>76,'discount'=>0),
+          array('listing_nid'=>176,'discount'=>28),
+          array('listing_nid'=>183,'discount'=>0),
+          array('listing_nid'=>76,'discount'=>0),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>196,'discount'=>-24),
+          array('listing_nid'=>208,'discount'=>25),
+          array('listing_nid'=>194,'discount'=>11),
+          array('listing_nid'=>192,'discount'=>0),
+          array('listing_nid'=>193,'discount'=>89),
+          array('listing_nid'=>217,'discount'=>0),
+          array('listing_nid'=>214,'discount'=>25),
+          array('listing_nid'=>215,'discount'=>43),
+          array('listing_nid'=>213,'discount'=>44),
+          array('listing_nid'=>229,'discount'=>31),
+          array('listing_nid'=>231,'discount'=>21),
+          array('listing_nid'=>235,'discount'=>25),
+          array('listing_nid'=>233,'discount'=>18),
+          array('listing_nid'=>238,'discount'=>25),
+          array('listing_nid'=>240,'discount'=>18),
+          array('listing_nid'=>242,'discount'=>27),
+          array('listing_nid'=>244,'discount'=>30),
+          array('listing_nid'=>246,'discount'=>28),
+          array('listing_nid'=>195,'discount'=>0),
+          array('listing_nid'=>255,'discount'=>10),
+          array('listing_nid'=>257,'discount'=>0),
+          array('listing_nid'=>261,'discount'=>-195),
+          array('listing_nid'=>188,'discount'=>88),
+          array('listing_nid'=>188,'discount'=>78),
+          array('listing_nid'=>188,'discount'=>2),
+          array('listing_nid'=>268,'discount'=>5),
+          array('listing_nid'=>270,'discount'=>16),
+          array('listing_nid'=>276,'discount'=>0),
+          array('listing_nid'=>172,'discount'=>0),
+          array('listing_nid'=>279,'discount'=>7),
+          array('listing_nid'=>281,'discount'=>16),
+          array('listing_nid'=>281,'discount'=>16),
+          array('listing_nid'=>281,'discount'=>16),
+          array('listing_nid'=>281,'discount'=>16),
+          array('listing_nid'=>287,'discount'=>0),
+          array('listing_nid'=>286,'discount'=>0),
+          array('listing_nid'=>290,'discount'=>36),
+          array('listing_nid'=>292,'discount'=>6),
+          array('listing_nid'=>294,'discount'=>8),
+          array('listing_nid'=>296,'discount'=>0),
+          array('listing_nid'=>298,'discount'=>6),
+          array('listing_nid'=>300,'discount'=>9),
+          array('listing_nid'=>302,'discount'=>34),
+          array('listing_nid'=>304,'discount'=>16),
+          array('listing_nid'=>306,'discount'=>8),
+          array('listing_nid'=>308,'discount'=>10),
+          array('listing_nid'=>310,'discount'=>8),
+          array('listing_nid'=>313,'discount'=>9),
+          array('listing_nid'=>315,'discount'=>8),
+          array('listing_nid'=>317,'discount'=>8),
+          array('listing_nid'=>319,'discount'=>6),
+          array('listing_nid'=>321,'discount'=>9),
+          array('listing_nid'=>325,'discount'=>9),
+          array('listing_nid'=>327,'discount'=>7),
+          array('listing_nid'=>329,'discount'=>10),
+          array('listing_nid'=>331,'discount'=>7),
+          array('listing_nid'=>334,'discount'=>7),
+          array('listing_nid'=>338,'discount'=>6),
+          array('listing_nid'=>340,'discount'=>9),
+          array('listing_nid'=>342,'discount'=>29),
+          array('listing_nid'=>346,'discount'=>14),
+          array('listing_nid'=>348,'discount'=>0),
+          array('listing_nid'=>350,'discount'=>9),
+          array('listing_nid'=>352,'discount'=>11),
+          array('listing_nid'=>353,'discount'=>10),
+          array('listing_nid'=>354,'discount'=>14),
+          array('listing_nid'=>355,'discount'=>14),
+          array('listing_nid'=>356,'discount'=>13),
+          array('listing_nid'=>357,'discount'=>12),
+          array('listing_nid'=>358,'discount'=>14),
+          array('listing_nid'=>360,'discount'=>0),
+          array('listing_nid'=>361,'discount'=>0),
+          array('listing_nid'=>372,'discount'=>12),
+          array('listing_nid'=>373,'discount'=>0),
+          array('listing_nid'=>374,'discount'=>0),
+          array('listing_nid'=>375,'discount'=>11),
+          array('listing_nid'=>376,'discount'=>13),
+          array('listing_nid'=>377,'discount'=>12),
+          array('listing_nid'=>378,'discount'=>11),
+          array('listing_nid'=>379,'discount'=>12),
+          array('listing_nid'=>380,'discount'=>12),
+          array('listing_nid'=>381,'discount'=>16),
+          array('listing_nid'=>382,'discount'=>10),
+          array('listing_nid'=>383,'discount'=>14),
+          array('listing_nid'=>384,'discount'=>12),
+          array('listing_nid'=>385,'discount'=>9),
+          array('listing_nid'=>386,'discount'=>28),
+          array('listing_nid'=>387,'discount'=>10),
+          array('listing_nid'=>388,'discount'=>0),
+          array('listing_nid'=>389,'discount'=>9),
+          array('listing_nid'=>390,'discount'=>13),
+          array('listing_nid'=>391,'discount'=>0),
+          array('listing_nid'=>392,'discount'=>20),
+          array('listing_nid'=>393,'discount'=>10),
+          array('listing_nid'=>394,'discount'=>12),
+          array('listing_nid'=>359,'discount'=>14),
+          array('listing_nid'=>396,'discount'=>10),
+          array('listing_nid'=>397,'discount'=>12),
+          array('listing_nid'=>398,'discount'=>11),
+          array('listing_nid'=>399,'discount'=>10),
+          array('listing_nid'=>400,'discount'=>9),
+          array('listing_nid'=>401,'discount'=>12),
+          array('listing_nid'=>402,'discount'=>11),
+          array('listing_nid'=>403,'discount'=>14),
+          array('listing_nid'=>404,'discount'=>11),
+          array('listing_nid'=>405,'discount'=>8),
+          array('listing_nid'=>406,'discount'=>6),
+          array('listing_nid'=>407,'discount'=>9),
+          array('listing_nid'=>408,'discount'=>6),
+          array('listing_nid'=>409,'discount'=>7),
+          array('listing_nid'=>410,'discount'=>9),
+          array('listing_nid'=>411,'discount'=>9),
+          array('listing_nid'=>412,'discount'=>14),
+          array('listing_nid'=>413,'discount'=>12),
+          array('listing_nid'=>414,'discount'=>14),
+          array('listing_nid'=>336,'discount'=>9),
+          array('listing_nid'=>415,'discount'=>9),
+          array('listing_nid'=>358,'discount'=>14),
+          array('listing_nid'=>416,'discount'=>18),
+          array('listing_nid'=>344,'discount'=>12),
+          array('listing_nid'=>417,'discount'=>10),
+          array('listing_nid'=>418,'discount'=>10),
+          array('listing_nid'=>419,'discount'=>0),
+          array('listing_nid'=>421,'discount'=>10),
+          array('listing_nid'=>422,'discount'=>7),
+          array('listing_nid'=>423,'discount'=>7),
+          array('listing_nid'=>424,'discount'=>9),
+          array('listing_nid'=>323,'discount'=>9),
+          array('listing_nid'=>425,'discount'=>13),
+          array('listing_nid'=>338,'discount'=>6),
+          array('listing_nid'=>426,'discount'=>28),
+          array('listing_nid'=>427,'discount'=>10),
+          array('listing_nid'=>428,'discount'=>6),
+          array('listing_nid'=>429,'discount'=>7),
+          array('listing_nid'=>430,'discount'=>11),
+          array('listing_nid'=>431,'discount'=>12),
+          array('listing_nid'=>432,'discount'=>7),
+          array('listing_nid'=>433,'discount'=>50),
+          array('listing_nid'=>434,'discount'=>12),
+          array('listing_nid'=>435,'discount'=>9),
+          array('listing_nid'=>508,'discount'=>0),
+          array('listing_nid'=>507,'discount'=>-24),
+          array('listing_nid'=>514,'discount'=>14),
+          array('listing_nid'=>521,'discount'=>4),
+          array('listing_nid'=>511,'discount'=>0),
+          array('listing_nid'=>512,'discount'=>0),
+          array('listing_nid'=>513,'discount'=>0),
+          array('listing_nid'=>224,'discount'=>11),
+          array('listing_nid'=>223,'discount'=>20),
+          array('listing_nid'=>225,'discount'=>0),
+          array('listing_nid'=>519,'discount'=>12),
+          array('listing_nid'=>254,'discount'=>0),
+          array('listing_nid'=>533,'discount'=>0),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>535,'discount'=>10),
+          array('listing_nid'=>94,'discount'=>-63),
+          array('listing_nid'=>94,'discount'=>-63),
+          array('listing_nid'=>252,'discount'=>-24),
+          array('listing_nid'=>574,'discount'=>37),
+          array('listing_nid'=>250,'discount'=>29),
+          array('listing_nid'=>578,'discount'=>11),
+          array('listing_nid'=>581,'discount'=>0),
+          array('listing_nid'=>582,'discount'=>0),
+          array('listing_nid'=>580,'discount'=>0),
+          array('listing_nid'=>583,'discount'=>0),
+          array('listing_nid'=>584,'discount'=>0),
+          array('listing_nid'=>585,'discount'=>0),
+          array('listing_nid'=>595,'discount'=>74),
+          array('listing_nid'=>595,'discount'=>57),
+          array('listing_nid'=>595,'discount'=>57),
+          array('listing_nid'=>595,'discount'=>0),
+          array('listing_nid'=>595,'discount'=>0),
+          array('listing_nid'=>595,'discount'=>57),
+          array('listing_nid'=>595,'discount'=>0),
+          array('listing_nid'=>608,'discount'=>83),
+          array('listing_nid'=>611,'discount'=>83),
+          array('listing_nid'=>613,'discount'=>0),
+          array('listing_nid'=>610,'discount'=>0),
+          array('listing_nid'=>616,'discount'=>25),
+          array('listing_nid'=>84,'discount'=>15),
+          array('listing_nid'=>624,'discount'=>14),
+          array('listing_nid'=>624,'discount'=>14),
+          array('listing_nid'=>623,'discount'=>10),
+          array('listing_nid'=>632,'discount'=>-12),
+          array('listing_nid'=>634,'discount'=>29),
+          array('listing_nid'=>639,'discount'=>0),
+          array('listing_nid'=>641,'discount'=>0),
+          array('listing_nid'=>568,'discount'=>18),
+          array('listing_nid'=>644,'discount'=>0),
+          array('listing_nid'=>652,'discount'=>0),
+          array('listing_nid'=>654,'discount'=>0),
+          array('listing_nid'=>656,'discount'=>0),
+          array('listing_nid'=>658,'discount'=>13),
+          array('listing_nid'=>258,'discount'=>90),
+          array('listing_nid'=>632,'discount'=>-12),
+          array('listing_nid'=>666,'discount'=>0),
+          array('listing_nid'=>253,'discount'=>15),
+          array('listing_nid'=>632,'discount'=>0),
+          array('listing_nid'=>632,'discount'=>-12),
+          array('listing_nid'=>632,'discount'=>0),
+          array('listing_nid'=>679,'discount'=>12),
+          array('listing_nid'=>679,'discount'=>12),
+          array('listing_nid'=>679,'discount'=>12),
+          array('listing_nid'=>684,'discount'=>15),
+          array('listing_nid'=>684,'discount'=>15),
+          array('listing_nid'=>684,'discount'=>15),
+          array('listing_nid'=>684,'discount'=>15),
+          array('listing_nid'=>689,'discount'=>12),
+          array('listing_nid'=>689,'discount'=>12),
+          array('listing_nid'=>689,'discount'=>12),
+          array('listing_nid'=>679,'discount'=>12),
+          array('listing_nid'=>689,'discount'=>12),
+          array('listing_nid'=>697,'discount'=>6),
+          array('listing_nid'=>697,'discount'=>6),
+          array('listing_nid'=>697,'discount'=>6),
+          array('listing_nid'=>697,'discount'=>6)
+        );
+
+        
+        foreach ($discounts as $a){
+            $listing_nid = db_result(db_query("SELECT listing_nid FROM best_nests_listings WHERE old_nid={$a['listing_nid']}"));
+            if ($a['discount'] != 0 && !is_null($listing_nid)){
+                
+                db_query("
+                    INSERT INTO best_nests_calendar
+                        (listing_nid, from_date, to_date, type, discount) 
+                    VALUES 
+                        (%d, %d, %d, '%s', %d)",
+                    $listing_nid, '20110909', '20111109', 'discount', $a['discount']);
+            }
+		
+        }
+        
+}*/

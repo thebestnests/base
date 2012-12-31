@@ -1,0 +1,14 @@
+1. searching
+    - create a test results tpl
+    - var dump or print_r search results
+
+    - tests
+        - basic matching
+            - single matches
+            - multiple matches
+                - exponential
+                - create spreadsheet for actual tests
+        - tallying and percentages
+            - basic tallies for booleans, dates, and radius
+            - percentages for boolean and radius
+            - number of days matched for availability and discounts

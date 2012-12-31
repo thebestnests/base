@@ -1,0 +1,18 @@
+<?php
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+function best_nests_checkout($type){
+    return theme('best-nests-checkout', $type);
+}
+
+function best_nests_subscription_pay(){
+    return theme('best_nests_checkout', 'subscription');
+}
+
+
+
+?>
